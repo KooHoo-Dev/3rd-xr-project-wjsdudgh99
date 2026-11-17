@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using Unity.XR.CoreUtils;
@@ -44,8 +45,15 @@ namespace AeAeng.EditorTools
             Undo.IncrementCurrentGroup();
             int undoGroup = Undo.GetCurrentGroup();
 
+            // 직접 꺼 둔 그룹(예: 상자 가구)은 다시 만들어도 꺼진 채로 유지
+            var keepOff = new HashSet<string>();
             var old = GameObject.Find(RootName);
-            if (old != null) Undo.DestroyObjectImmediate(old);
+            if (old != null)
+            {
+                foreach (Transform child in old.transform)
+                    if (!child.gameObject.activeSelf) keepOff.Add(child.name);
+                Undo.DestroyObjectImmediate(old);
+            }
 
             var root = new GameObject(RootName);
             Undo.RegisterCreatedObjectUndo(root, "Build Test Bedroom");
@@ -130,7 +138,10 @@ namespace AeAeng.EditorTools
             ceil.intensity = 1f;
             ceil.shadows = LightShadows.None;
 
-            var panel = Box(lighting, "CeilingPanel", new Vector3(1.1f, Height - 0.02f, 1.3f), new Vector3(1.2f, 0.04f, 0.3f), mPanel, collider: false);
+            // 원형 천장등 (빛이 원형으로 퍼지니 등도 원형). Cylinder 높이 = scale.y * 2 → 두께 4cm, 지름 90cm
+            const float PanelDiameter = 0.9f;
+            var panel = Cylinder(lighting, "CeilingPanel", new Vector3(1.1f, Height - 0.02f, 1.3f),
+                new Vector3(PanelDiameter, 0.02f, PanelDiameter), mPanel, collider: false);
             panel.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.Off;
 
             var controller = lighting.AddComponent<RoomLightController>();
@@ -231,6 +242,11 @@ namespace AeAeng.EditorTools
                 tmp.text = "LIGHT OFF";
                 tuner.label = tmp;
             }
+
+            foreach (Transform child in root.transform)
+                if (keepOff.Contains(child.name)) child.gameObject.SetActive(false);
+            if (keepOff.Count > 0)
+                Debug.Log($"[TestBedroom] 꺼 두었던 그룹을 꺼진 채로 유지: {string.Join(", ", keepOff)}");
 
             Undo.CollapseUndoOperations(undoGroup);
             EditorSceneManager.MarkSceneDirty(scene);
@@ -392,8 +408,9 @@ namespace AeAeng.EditorTools
             bool collider = true, bool local = false)
             => Primitive(PrimitiveType.Cube, parent, name, pos, size, mat, collider, local);
 
-        static GameObject Cylinder(GameObject parent, string name, Vector3 pos, Vector3 size, Material mat)
-            => Primitive(PrimitiveType.Cylinder, parent, name, pos, size, mat, true, false);
+        static GameObject Cylinder(GameObject parent, string name, Vector3 pos, Vector3 size, Material mat,
+            bool collider = true)
+            => Primitive(PrimitiveType.Cylinder, parent, name, pos, size, mat, collider, false);
 
         static GameObject Sphere(GameObject parent, string name, Vector3 pos, Material mat)
         {
