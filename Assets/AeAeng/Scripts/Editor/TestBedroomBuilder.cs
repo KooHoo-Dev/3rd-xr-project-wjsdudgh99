@@ -14,7 +14,11 @@ namespace AeAeng.EditorTools
     /// 다시 실행하면 기존 TestBedroom 을 지우고 새로 만든다.
     ///
     /// 좌표 기준 (XR Origin = 원점, 플레이어는 +Z 를 바라봄)
-    ///   뒤(머리 쪽) 벽 z = -0.45 / 왼쪽 벽 x = -0.6 / 오른쪽 x = 3.4 / 앞 z = 3.6 / 천장 y = 2.4
+    ///   정사각형 방 3m x 3m (작은 원룸 침실, 플레이어는 이동하지 않음)
+    ///   뒤(머리 쪽) 벽 z = -0.45 / 왼쪽 벽 x = -0.6 / 오른쪽 x = 2.4 / 앞 z = 2.55 / 천장 y = 2.4
+    ///
+    /// 문: 씬에 "Free Wood Door Pack" 문 프리팹이 놓여 있으면, 가장 가까운 벽에 그 문 크기에 맞는
+    ///     구멍을 뚫은 벽(좌 / 우 / 위 3조각)을 만들고, 문을 벽 두께 가운데로 맞춘다.
     /// </summary>
     public static class TestBedroomBuilder
     {
@@ -22,8 +26,16 @@ namespace AeAeng.EditorTools
         const string MatDir = "Assets/AeAeng/Materials/TestBedroom";
         const string XROriginPrefabPath =
             "Assets/Samples/XR Interaction Toolkit/3.5.1/Starter Assets/Prefabs/XR Origin (XR Rig).prefab";
+        const string DoorPackPath = "Assets/Free Wood Door Pack/";
 
-        const float Left = -0.6f, Right = 3.4f, Back = -0.45f, Front = 3.6f, Height = 2.4f, Wall = 0.1f;
+        const float RoomSize = 3f;
+        const float Left = -0.6f, Back = -0.45f;
+        const float Right = Left + RoomSize, Front = Back + RoomSize;
+        const float Height = 2.4f, Wall = 0.1f;
+        /// <summary>벽이 문틀을 살짝 덮도록 구멍을 이만큼 작게 뚫음 (틈으로 빛이 새지 않게)</summary>
+        const float DoorOverlap = 0.01f;
+
+        enum Side { Back, Front, Left, Right }
 
         [MenuItem("AeAeng/Build Test Bedroom")]
         public static void Build()
@@ -58,10 +70,7 @@ namespace AeAeng.EditorTools
             float w = Right - Left, d = Front - Back, cx = (Left + Right) / 2f, cz = (Back + Front) / 2f;
             Box(room, "Floor", new Vector3(cx, -Wall / 2, cz), new Vector3(w + Wall * 2, Wall, d + Wall * 2), mFloor);
             Box(room, "Ceiling", new Vector3(cx, Height + Wall / 2, cz), new Vector3(w + Wall * 2, Wall, d + Wall * 2), mCeiling);
-            Box(room, "Wall_Back (Head)", new Vector3(cx, Height / 2, Back - Wall / 2), new Vector3(w, Height, Wall), mWall);
-            Box(room, "Wall_Front", new Vector3(cx, Height / 2, Front + Wall / 2), new Vector3(w, Height, Wall), mWall);
-            Box(room, "Wall_Left", new Vector3(Left - Wall / 2, Height / 2, cz), new Vector3(Wall, Height, d), mWall);
-            Box(room, "Wall_Right", new Vector3(Right + Wall / 2, Height / 2, cz), new Vector3(Wall, Height, d), mWall);
+            BuildWalls(room, mWall);
 
             // 창문 (왼쪽 벽, 달빛 느낌의 Unlit 면 + 창살)
             var window = Child(room, "Window");
@@ -227,6 +236,147 @@ namespace AeAeng.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             Selection.activeGameObject = root;
             Debug.Log("[TestBedroom] 테스트 침실 생성 완료. 씬을 저장(Ctrl+S)하세요.");
+        }
+
+        // ================= 벽 / 문 =================
+
+        static readonly Side[] AllSides = { Side.Back, Side.Front, Side.Left, Side.Right };
+
+        static void BuildWalls(GameObject room, Material mat)
+        {
+            var door = FindDoor();
+            Bounds doorBounds = default;
+            Side doorSide = Side.Right;
+            bool hasDoor = door != null && TryGetBounds(door, out doorBounds);
+
+            if (hasDoor)
+            {
+                doorSide = NearestSide(doorBounds.center);
+                SnapIntoWall(door, doorSide, ref doorBounds);
+            }
+
+            foreach (var side in AllSides)
+            {
+                if (hasDoor && side == doorSide && WallWithDoor(room, side, doorBounds, mat, door.name))
+                    continue;
+                WallPiece(room, WallName(side), side, AlongMin(side), AlongMax(side), 0f, Height, mat);
+            }
+        }
+
+        /// <summary>문 크기에 맞춰 구멍 뚫린 벽 (좌 / 우 / 위 3조각)</summary>
+        static bool WallWithDoor(GameObject room, Side side, Bounds db, Material mat, string doorName)
+        {
+            bool alongX = AlongX(side);
+            float wallMin = AlongMin(side), wallMax = AlongMax(side);
+            float o0 = (alongX ? db.min.x : db.min.z) + DoorOverlap;
+            float o1 = (alongX ? db.max.x : db.max.z) - DoorOverlap;
+            float top = Mathf.Min(db.max.y - DoorOverlap, Height);
+
+            if (o0 < wallMin || o1 > wallMax || o1 - o0 < 0.3f || top < 1f)
+            {
+                Debug.LogWarning($"[TestBedroom] 문 '{doorName}' 이(가) {side} 벽 범위를 벗어나서 구멍을 뚫지 않았습니다. " +
+                                 $"문 위치를 벽 안쪽으로 옮긴 뒤 다시 실행하세요. (구멍 {o0:0.00}~{o1:0.00}, 벽 {wallMin:0.00}~{wallMax:0.00})");
+                return false;
+            }
+
+            var wall = Child(room, WallName(side) + " (Door)");
+            if (o0 - wallMin > 0.001f) WallPiece(wall, "Side_A", side, wallMin, o0, 0f, Height, mat);
+            if (wallMax - o1 > 0.001f) WallPiece(wall, "Side_B", side, o1, wallMax, 0f, Height, mat);
+            if (Height - top > 0.001f) WallPiece(wall, "Lintel", side, o0, o1, top, Height, mat);
+
+            Debug.Log($"[TestBedroom] {side} 벽에 문 구멍: 폭 {o1 - o0:0.000}m, 높이 {top:0.000}m (문 '{doorName}' 기준)");
+            return true;
+        }
+
+        static GameObject WallPiece(GameObject parent, string name, Side side, float a0, float a1, float y0, float y1, Material mat)
+        {
+            float ac = (a0 + a1) / 2f, al = a1 - a0, yc = (y0 + y1) / 2f, yl = y1 - y0, p = PerpCenter(side);
+            bool alongX = AlongX(side);
+            var pos = alongX ? new Vector3(ac, yc, p) : new Vector3(p, yc, ac);
+            var size = alongX ? new Vector3(al, yl, Wall) : new Vector3(Wall, yl, al);
+            return Box(parent, name, pos, size, mat);
+        }
+
+        static bool AlongX(Side s) => s == Side.Back || s == Side.Front;
+        static float AlongMin(Side s) => AlongX(s) ? Left : Back;
+        static float AlongMax(Side s) => AlongX(s) ? Right : Front;
+
+        /// <summary>벽 두께의 가운데 좌표 (벽에 수직인 축)</summary>
+        static float PerpCenter(Side s) => s switch
+        {
+            Side.Back => Back - Wall / 2,
+            Side.Front => Front + Wall / 2,
+            Side.Left => Left - Wall / 2,
+            _ => Right + Wall / 2,
+        };
+
+        static string WallName(Side s) => s switch
+        {
+            Side.Back => "Wall_Back (Head)",
+            Side.Front => "Wall_Front",
+            Side.Left => "Wall_Left",
+            _ => "Wall_Right",
+        };
+
+        static Side NearestSide(Vector3 c)
+        {
+            Side best = Side.Right;
+            float bestDist = float.MaxValue;
+            foreach (var s in AllSides)
+            {
+                float dist = Mathf.Abs((AlongX(s) ? c.z : c.x) - PerpCenter(s));
+                if (dist < bestDist) { bestDist = dist; best = s; }
+            }
+            return best;
+        }
+
+        /// <summary>문을 벽 두께 가운데로 옮김 (벽과 나란한 방향 위치와 높이는 그대로)</summary>
+        static void SnapIntoWall(GameObject door, Side side, ref Bounds b)
+        {
+            float delta = PerpCenter(side) - (AlongX(side) ? b.center.z : b.center.x);
+            if (Mathf.Abs(delta) < 0.0005f) return;
+
+            var move = AlongX(side) ? new Vector3(0, 0, delta) : new Vector3(delta, 0, 0);
+            Undo.RecordObject(door.transform, "Snap door into wall");
+            door.transform.position += move;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(door.transform);
+            b.center += move;
+            Debug.Log($"[TestBedroom] 문 '{door.name}' 을(를) {side} 벽 두께 가운데로 {delta:+0.000;-0.000}m 옮겼습니다.");
+        }
+
+        /// <summary>씬에서 Free Wood Door Pack 프리팹으로 놓은 문을 찾음</summary>
+        static GameObject FindDoor()
+        {
+            GameObject found = null;
+            int count = 0;
+            foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            {
+                var go = t.gameObject;
+                if (!PrefabUtility.IsOutermostPrefabInstanceRoot(go)) continue;
+                var source = PrefabUtility.GetCorrespondingObjectFromSource(go);
+                string path = source != null ? AssetDatabase.GetAssetPath(source) : null;
+                if (string.IsNullOrEmpty(path) || !path.StartsWith(DoorPackPath)) continue;
+                count++;
+                if (found == null) found = go;
+            }
+
+            if (count > 1)
+                Debug.LogWarning($"[TestBedroom] 문이 {count}개 있습니다. '{found.name}' 하나에만 벽 구멍을 만듭니다.");
+            if (found == null)
+                Debug.Log("[TestBedroom] 씬에 문 프리팹이 없어서 막힌 벽만 만들었습니다.");
+            return found;
+        }
+
+        static bool TryGetBounds(GameObject go, out Bounds bounds)
+        {
+            bounds = default;
+            bool any = false;
+            foreach (var r in go.GetComponentsInChildren<Renderer>())
+            {
+                if (!any) { bounds = r.bounds; any = true; }
+                else bounds.Encapsulate(r.bounds);
+            }
+            return any;
         }
 
         // ================= helpers =================
