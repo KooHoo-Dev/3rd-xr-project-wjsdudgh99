@@ -69,6 +69,9 @@ namespace AeAeng
             Debug.Log($"[RoundClock] 시간 이동 → {GameTime:h:mm} (남은 {Remaining:0}초)");
         }
 
+        /// <summary>시계를 지금 시각에서 멈춤 (판이 끝나 파티 연출 중). 게임 시각은 그대로 보여줌.</summary>
+        public void Pause() => IsRunning = false;
+
         /// <summary>판을 끝내고 시계를 실제 시각으로 되돌린다 (메인 화면 / 결과 화면).</summary>
         public void StopRound()
         {

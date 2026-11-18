@@ -154,6 +154,12 @@ namespace AeAeng
             Debug.Log($"[MosquitoSwarm] 모기 {_active.Count}마리 등장 (착지 지점 {_landing.Length}곳)");
         }
 
+        /// <summary>모기와 댄싱 파티: 못 잡은 모기가 모두 머리 주변에서 맴돎</summary>
+        public void Dance()
+        {
+            foreach (var m in _active) if (m != null) m.Dance();
+        }
+
         public void DespawnAll()
         {
             foreach (var m in _active) if (m != null) m.Despawn();

@@ -39,6 +39,7 @@ namespace AeAeng
         float _nextApproachRoll;
         float _approachAngle;
         float _noiseSeed;
+        bool _dancing;
         float _pitchJitter = 1f;
         float _volumeFade = 1f;
         LandingPoint _landing;
@@ -73,9 +74,19 @@ namespace AeAeng
             Enter(State.Fly);
         }
 
+        /// <summary>모기와 댄싱 파티: 못 잡은 모기가 모두 나와서 머리 주변을 신나게 맴돎 (다음 판까지)</summary>
+        public void Dance()
+        {
+            if (Current == State.Caught) return;
+            if (Current == State.Hidden) Spawn(swarm.RandomFlyPoint());
+            _dancing = true;
+            Enter(State.Approach);
+        }
+
         /// <summary>판 끝 / 정리: 소리와 모습을 끔</summary>
         public void Despawn()
         {
+            _dancing = false;
             ReleaseLanding();
             _audio.Stop();
             SetVisible(false);
@@ -174,6 +185,7 @@ namespace AeAeng
                     break;
 
                 case State.Approach:
+                    if (_dancing) { Orbit(dt * 1.8f); break; } // 댄싱 파티: 불과 상관없이 계속 빠르게 맴돎
                     if (lightOn) { Enter(State.ToWall); break; }
                     Orbit(dt);
                     if (_stateTime > S.approachSeconds) Enter(State.Fly);
