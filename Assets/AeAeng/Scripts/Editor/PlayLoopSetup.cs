@@ -47,13 +47,14 @@ namespace AeAeng.EditorTools
             var banner = Ensure<PartyBanner>(bannerGo);
             var bannerLock = Ensure<HeadLock>(bannerGo);
             bannerLock.distance = 1.4f; bannerLock.height = 0.05f; bannerLock.followSpeed = 2f;
-            banner.text = Text(bannerGo, font, overlayMat, 0.16f, new Vector2(1.6f, 0.4f), FontStyles.Bold);
+            // ※ TextMeshPro(3D) 글자 크기는 10 = 1m. 11/18 처음엔 m 단위로 넣어서 10배 작았음
+            banner.text = Text(bannerGo, font, overlayMat, 1.3f, new Vector2(2.4f, 0.5f), FontStyles.Bold);   // 약 13cm (1.4m 앞)
 
             var subGo = FindOrCreate("Subtitles", systems.transform);
             var sub = Ensure<SubtitlePanel>(subGo);
             var subLock = Ensure<HeadLock>(subGo);
             subLock.distance = 1.1f; subLock.height = -0.32f; subLock.followSpeed = 3f;
-            sub.text = Text(subGo, font, overlayMat, 0.055f, new Vector2(1.0f, 0.15f), FontStyles.Normal);
+            sub.text = Text(subGo, font, overlayMat, 0.5f, new Vector2(1.6f, 0.2f), FontStyles.Bold);      // 약 5cm (1.1m 앞)
 
             // ---- 화면 페이드 (카메라 자식) ----
             var fade = cam.GetComponentInChildren<ScreenFade>(true);
@@ -110,7 +111,7 @@ namespace AeAeng.EditorTools
             go.transform.localPosition = new Vector3(0f, 0.032f, -0.035f);
             go.transform.localRotation = Quaternion.LookRotation(Vector3.down, Vector3.forward);
             var ui = Ensure<WristUI>(go);
-            ui.text = Text(go, font, font.material, 0.022f, new Vector2(0.11f, 0.05f), FontStyles.Bold);
+            ui.text = Text(go, font, font.material, 0.12f, new Vector2(0.18f, 0.06f), FontStyles.Bold);    // 약 1.2cm (손목, 눈앞 30~40cm)
             ui.text.color = new Color(0.55f, 0.9f, 1f); // 유령 손과 어울리는 하늘색
             return "왼손 손목";
         }
