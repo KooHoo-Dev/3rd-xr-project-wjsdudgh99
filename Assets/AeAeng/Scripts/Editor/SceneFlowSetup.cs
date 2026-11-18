@@ -134,6 +134,8 @@ namespace AeAeng.EditorTools
                 var go = GameObject.Find(name);
                 if (go != null) kill.Add(go);
             }
+            foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (t.name == "TunerLabel") kill.Add(t.gameObject); // 녹색 LIGHT OFF 글씨 (테스트용)
             foreach (var m in Object.FindObjectsByType<Mosquito>(FindObjectsInactive.Include, FindObjectsSortMode.None)) kill.Add(m.gameObject);
             foreach (var w in Object.FindObjectsByType<WristUI>(FindObjectsInactive.Include, FindObjectsSortMode.None)) kill.Add(w.gameObject);
             foreach (var go in kill) if (go != null) Object.DestroyImmediate(go);

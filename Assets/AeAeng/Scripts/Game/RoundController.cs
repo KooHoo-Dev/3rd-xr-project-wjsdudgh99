@@ -62,6 +62,8 @@ namespace AeAeng
             {
                 swarm.onAllCaught.AddListener(OnAllCaught);
                 swarm.onMessage.AddListener(ShowSubtitle);
+                swarm.onCaught.AddListener(OnCaught);
+                swarm.onEscaped.AddListener(OnEscaped);
             }
             if (clock != null) clock.onMorning.AddListener(OnMorning);
         }
@@ -72,6 +74,8 @@ namespace AeAeng
             {
                 swarm.onAllCaught.RemoveListener(OnAllCaught);
                 swarm.onMessage.RemoveListener(ShowSubtitle);
+                swarm.onCaught.RemoveListener(OnCaught);
+                swarm.onEscaped.RemoveListener(OnEscaped);
             }
             if (clock != null) clock.onMorning.RemoveListener(OnMorning);
         }
@@ -139,6 +143,19 @@ namespace AeAeng
             yield return new WaitForSeconds(0.3f);
             BeginRound();
             if (fade != null) yield return fade.FadeTo(0f, wakeFadeSeconds);
+        }
+
+        // 잡을 때마다 "N마리 잡았다!" (마지막 한 마리는 꿈나라 파티 문구가 대신함)
+        void OnCaught(Mosquito m)
+        {
+            if (subtitles == null || swarm == null || Current != Phase.Playing) return;
+            int remaining = swarm.Total - swarm.Caught;
+            if (remaining > 0) subtitles.ShowCatch(swarm.Caught, remaining);
+        }
+
+        void OnEscaped()
+        {
+            if (subtitles != null && Current == Phase.Playing) subtitles.ReportEscape();
         }
 
         void ShowSubtitle(string text)

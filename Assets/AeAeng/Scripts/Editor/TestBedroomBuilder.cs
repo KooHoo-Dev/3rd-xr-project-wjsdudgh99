@@ -214,25 +214,11 @@ namespace AeAeng.EditorTools
             }
 
             // ---------- 밝기 튜너 (테스트용) ----------
-            var tunerGO = Child(root, "LightingTuner (TEST)");
-            var tuner = tunerGO.AddComponent<LightingTuner>();
-            tuner.room = controller;
+            // 11/18 제거: 밝기 값은 확정됐고, 카메라 앞 녹색 "LIGHT OFF" 글씨가 상시로 보였음.
+            // 그 자리(시선 아래)는 잡기/도망 알림(SubtitlePanel 토스트)이 씀. 남아 있는 안내 글씨도 지움.
             if (xrCam != null)
-            {
-                var labelGO = new GameObject("TunerLabel");
-                Undo.RegisterCreatedObjectUndo(labelGO, "Tuner Label");
-                labelGO.transform.SetParent(xrCam.transform, false);
-                labelGO.transform.localPosition = new Vector3(0f, -0.28f, 1.0f);
-                labelGO.transform.localRotation = Quaternion.Euler(15f, 0f, 0f);
-                var tmp = labelGO.AddComponent<TextMeshPro>();
-                tmp.fontSize = 0.4f;
-                tmp.alignment = TextAlignmentOptions.Center;
-                tmp.color = new Color(0.3f, 1f, 0.4f);
-                tmp.rectTransform.sizeDelta = new Vector2(0.8f, 0.3f);
-                tmp.textWrappingMode = TextWrappingModes.NoWrap;
-                tmp.text = "LIGHT OFF";
-                tuner.label = tmp;
-            }
+                foreach (var t in xrCam.GetComponentsInChildren<Transform>(true))
+                    if (t != null && t.name == "TunerLabel") Undo.DestroyObjectImmediate(t.gameObject);
 
             foreach (Transform child in root.transform)
                 if (keepOff.Contains(child.name)) child.gameObject.SetActive(false);

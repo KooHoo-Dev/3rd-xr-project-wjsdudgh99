@@ -87,6 +87,8 @@ namespace AeAeng
         public UnityEvent<string> onMessage;
         public UnityEvent<Mosquito> onCaught;
         public UnityEvent onAllCaught;
+        [Tooltip("모기 한 마리가 눈치채고 도망감 (알림: 모기 N마리가 사라졌다!)")]
+        public UnityEvent onEscaped;
 
         public int Total { get; private set; }
         public int Caught { get; private set; }
@@ -193,6 +195,13 @@ namespace AeAeng
 
         public void Message(Msg msg)
         {
+            if (msg == Msg.Escaped)
+            {
+                // 11/18: 문구 대신 이벤트 → 알림(토스트)이 0.6초 안의 도망을 묶어 "모기 N마리가 사라졌다!"
+                Debug.Log("[MosquitoSwarm] 모기가 도망감");
+                onEscaped?.Invoke();
+                return;
+            }
             string text = msg switch
             {
                 Msg.Escaped => "모기가 사라졌습니다",
