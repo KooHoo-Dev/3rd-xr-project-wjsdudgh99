@@ -5494,6 +5494,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AeAeng.LightSwitchInput
   room: {fileID: 1305209322}
   longPressSeconds: 1
+  clickClip: {fileID: 8300000, guid: 70f2a74ac3538384bb4eab73e0d6277c, type: 3}
+  clickVolume: 0.7
+  clickStartTime: 0.05
+  clickHapticAmplitude: 0.35
+  clickHapticDuration: 0.04
   onLongPress:
     m_PersistentCalls:
       m_Calls:

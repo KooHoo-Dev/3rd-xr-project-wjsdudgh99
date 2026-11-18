@@ -45,6 +45,52 @@ namespace AeAeng
         LandingPoint _landing;
         Vector3 _escapeDir;
 
+        // 공중에서 잡혔을 때 떨어지기 (11/18)
+        bool _falling;
+        Vector3 _fallVel;
+        Vector3 _spin;
+        static readonly RaycastHit[] _fallHits = new RaycastHit[8];
+        const float FallGravity = 9.8f;
+        const float FallMaxSpeed = 3.0f;   // 가벼운 벌레라 공기 저항으로 이 이상 안 빨라짐
+        const float FallTimeout = 3.0f;    // 아무 데도 안 닿으면 이 시간 뒤 사라짐
+        const float LieSeconds = 1.5f;     // 바닥에 떨어진 뒤 보이는 시간
+
+        void Fall(float dt)
+        {
+            _fallVel.y = Mathf.Max(_fallVel.y - FallGravity * dt, -FallMaxSpeed);
+            _fallVel.x *= 1f - 2f * dt;
+            _fallVel.z *= 1f - 2f * dt;
+            var step = _fallVel * dt;
+            var p = transform.position;
+
+            // 바닥/가구에 닿으면 배를 깔고 멈춤 (트리거는 무시)
+            // 손에 든 무기처럼 움직이는 물체(Rigidbody 있음) 위에는 안 앉음
+            if (step.y < 0f)
+            {
+                int n = Physics.RaycastNonAlloc(p, step.normalized, _fallHits, step.magnitude + 0.01f, ~0, QueryTriggerInteraction.Ignore);
+                float best = float.MaxValue; int bi = -1;
+                for (int i = 0; i < n; i++)
+                    if (_fallHits[i].collider.attachedRigidbody == null && _fallHits[i].distance < best) { best = _fallHits[i].distance; bi = i; }
+                if (bi >= 0) { Land(_fallHits[bi].point, _fallHits[bi].normal); return; }
+            }
+            p += step;
+            if (p.y <= 0.005f) { Land(new Vector3(p.x, 0.005f, p.z), Vector3.up); return; } // 콜라이더 없는 바닥 대비
+            transform.position = p;
+            transform.Rotate(_spin * dt, Space.World);
+
+            if (_stateTime > FallTimeout) { SetVisible(false); enabled = false; }
+        }
+
+        void Land(Vector3 point, Vector3 normal)
+        {
+            _falling = false;
+            var fwd = Vector3.ProjectOnPlane(transform.forward, normal);
+            if (fwd.sqrMagnitude < 1e-4f) fwd = Vector3.ProjectOnPlane(Vector3.forward, normal);
+            transform.SetPositionAndRotation(point + normal * 0.004f, Quaternion.LookRotation(fwd, normal));
+            // 남은 표시 시간: 지금부터 LieSeconds 뒤 사라지게
+            _stateTime = S.caughtLinger - LieSeconds;
+        }
+
         MosquitoSwarm.Settings S => swarm.settings;
 
         void Awake()
@@ -66,6 +112,7 @@ namespace AeAeng
         public void Spawn(Vector3 pos)
         {
             transform.localScale = _baseScale;
+            _falling = false;
             transform.position = pos;
             _velocity = Vector3.zero;
             SetVisible(true);
@@ -109,6 +156,8 @@ namespace AeAeng
             }
             if (method == Method.Hand && (!S.handCatch || d > S.handReach)) return false;
 
+            // 11/18: 날고 있다가 잡히면 바닥(또는 가구 위)으로 툭 떨어짐. 앉아 있다 잡히면 그 자리에서 납작
+            _falling = Current == State.Fly || Current == State.Approach || Current == State.ToWall;
             Enter(State.Caught);
             swarm.NotifyCaught(this, method);
             return true;
@@ -162,8 +211,17 @@ namespace AeAeng
                     SetWings(false);
                     foreach (var c in _colliders) c.enabled = false;
                     _audio.Stop();
-                    // 납작하게 (등 방향으로 눌림)
-                    transform.localScale = Vector3.Scale(_baseScale, new Vector3(1.3f, 0.25f, 1.1f));
+                    if (_falling)
+                    {
+                        // 맞은 순간 살짝 튕겨 나가며 빙글빙글 떨어짐
+                        _fallVel = new Vector3(Random.Range(-0.4f, 0.4f), 0.3f, Random.Range(-0.4f, 0.4f));
+                        _spin = Random.onUnitSphere * Random.Range(540f, 900f);
+                    }
+                    else
+                    {
+                        // 납작하게 (등 방향으로 눌림)
+                        transform.localScale = Vector3.Scale(_baseScale, new Vector3(1.3f, 0.25f, 1.1f));
+                    }
                     break;
             }
         }
@@ -228,6 +286,11 @@ namespace AeAeng
                     break;
 
                 case State.Caught:
+                    if (_falling)
+                    {
+                        Fall(dt);
+                        break;
+                    }
                     if (_stateTime > S.caughtLinger)
                     {
                         SetVisible(false);

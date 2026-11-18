@@ -27,7 +27,6 @@ namespace AeAeng.EditorTools
         const string ResultPath = "Assets/AeAeng/Result.unity";
         const string FontPath = "Assets/99. External Assets/Font/Noto_Sans_KR/NotoSansKR-Regular SDF.asset";
 
-
         static readonly Color PanelColor = new Color(0.04f, 0.06f, 0.11f, 0.88f);
         static readonly Color TitleColor = new Color(1f, 0.93f, 0.75f);
         static readonly Color TextColor = new Color(0.92f, 0.94f, 1f);
@@ -165,7 +164,7 @@ namespace AeAeng.EditorTools
             // 11/18: 제작자 이름 뺌, 무기 버튼은 Start 뒤 무기 선택창으로 옮김
             var canvas = MakeCanvas("MenuPanel", null, cam, new Vector2(900, 520), 0.0013f);
             canvas.transform.SetPositionAndRotation(SeatFront(2.0f, 1.35f), SeatRotation());
-            Label(canvas.transform, "Title", "애앵~", 170, new Vector2(0, 90), new Vector2(860, 220), TitleColor, FontStyles.Bold);
+            Label(canvas.transform, "Title", "애~앵", 170, new Vector2(0, 90), new Vector2(860, 220), TitleColor, FontStyles.Bold);
             var start = MakeButton(canvas.transform, "Start", "Start", new Vector2(-170, -140), ButtonColor);
             var exit = MakeButton(canvas.transform, "Exit", "Exit", new Vector2(170, -140), ButtonAltColor);
             UnityEventTools.AddPersistentListener(start.onClick, ctrl.OnStartButton);
@@ -206,7 +205,7 @@ namespace AeAeng.EditorTools
                     ("길이", "45cm"),
                     ("치는 면", "14 x 16cm"),
                     ("공중 저격 확률", Percent(swatterHit, 0.2f)),
-                    ("스윙 속도", SpeedText(swatterHit, 3.5f)),
+                    ("스윙 속도", "보통"),   // 기준은 3.5m/s 지만 채가 길어(머리 38cm) 손목은 신문지보다 덜 돌려도 됨
                 });
             var b = WeaponCard(canvas.transform, "Card_Newspaper", new Vector2(270, 10), "신문지",
                 RenderWeaponIcon(NewspaperPrefabPath, "WeaponIcon_Newspaper"),
@@ -215,7 +214,7 @@ namespace AeAeng.EditorTools
                     ("길이", "32cm"),
                     ("치는 면", "끝쪽 16cm"),
                     ("공중 저격 확률", Percent(paperHit, 0.35f)),
-                    ("스윙 속도", SpeedText(paperHit, 3.0f)),
+                    ("스윙 속도", "빠르게"), // 3.0m/s, 머리 22cm
                 });
             UnityEventTools.AddPersistentListener(a.onClick, ctrl.OnStartFlySwatter);
             UnityEventTools.AddPersistentListener(b.onClick, ctrl.OnStartNewspaper);
@@ -227,12 +226,6 @@ namespace AeAeng.EditorTools
 
         static string Percent(SwatterHit hit, float fallback) =>
             $"{Mathf.RoundToInt((hit != null ? hit.airCatchChance : fallback) * 100f)}%";
-
-        static string SpeedText(SwatterHit hit, float fallback)
-        {
-            float v = hit != null ? hit.minSpeed : fallback;
-            return v >= 3.2f ? "빠르게" : "보통";
-        }
 
         /// <summary>카드 하나: 이름(위) → 정사각형 이미지 → 스펙 줄 → 시작 버튼. 시작 버튼을 돌려줌</summary>
         static Button WeaponCard(Transform parent, string name, Vector2 pos, string title, Sprite icon, (string, string)[] specs)
