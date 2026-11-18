@@ -48,6 +48,12 @@ namespace AeAeng
         [Tooltip("새 판이 밝아지는 시간")]
         public float wakeFadeSeconds = 1.2f;
 
+        [Header("7시 알람 (11/18)")]
+        [Tooltip("아침 7시(모기와 댄싱 파티)에 벽시계에서 울리는 소리")]
+        public AudioClip alarmClip;
+        [Range(0f, 1f)] public float alarmVolume = 0.8f;
+        AudioSource _alarm;
+
         [Header("이벤트 (효과음/햅틱 묶음에서 연결)")]
         public UnityEvent onRoundStart;
         public UnityEvent<PartyType> onParty;
@@ -64,6 +70,32 @@ namespace AeAeng
             if (banner == null) banner = FindFirstObjectByType<PartyBanner>(FindObjectsInactive.Include);
             if (subtitles == null) subtitles = FindFirstObjectByType<SubtitlePanel>(FindObjectsInactive.Include);
             GameManager.Get();
+            SetupAlarm();
+        }
+
+        // 알람은 벽에 걸린 시계 자리에서 3D로 울림 (시계가 없으면 이 오브젝트 자리)
+        void SetupAlarm()
+        {
+            if (alarmClip == null) return;
+            Transform at = transform;
+            if (clock != null && clock.clocks != null && clock.clocks.Length > 0 && clock.clocks[0] != null) at = clock.clocks[0].transform;
+            var go = new GameObject("AlarmSound");
+            go.transform.SetParent(at, false);
+            _alarm = go.AddComponent<AudioSource>();
+            _alarm.clip = alarmClip;
+            _alarm.playOnAwake = false;
+            _alarm.loop = false;
+            _alarm.volume = alarmVolume;
+            _alarm.spatialBlend = 1f;
+            _alarm.rolloffMode = AudioRolloffMode.Logarithmic;
+            _alarm.minDistance = 1.0f;
+            _alarm.maxDistance = 8f;
+            _alarm.dopplerLevel = 0f;
+        }
+
+        void StopAlarm()
+        {
+            if (_alarm != null && _alarm.isPlaying) _alarm.Stop();
         }
 
         void OnEnable()
@@ -107,6 +139,7 @@ namespace AeAeng
         public void BeginRound()
         {
             RoundNumber++;
+            StopAlarm(); // 다음 판(밤)이 시작되면 알람 끔
             if (room != null) room.SetLight(false, false);
             if (clock != null) clock.StartRound();
             int n = MosquitoesThisRound;
@@ -142,7 +175,8 @@ namespace AeAeng
             }
             else
             {
-                // 아침까지 못 잡음 → 남은 모기들이 머리 주변에서 춤춤
+                // 아침까지 못 잡음 → 알람 + 남은 모기들이 머리 주변에서 춤춤
+                if (_alarm != null) _alarm.Play();
                 if (swarm != null) swarm.Dance();
                 if (banner != null) banner.Show(GameManager.DanceTitle, bannerSeconds);
                 yield return new WaitForSeconds(bannerSeconds + 0.3f);

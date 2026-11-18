@@ -1989,6 +1989,8 @@ MonoBehaviour:
   sleepFadeSeconds: 2.5
   betweenFadeSeconds: 0.6
   wakeFadeSeconds: 1.2
+  alarmClip: {fileID: 8300000, guid: 287e8362a50e85749ae6fc7bfe8f39dc, type: 3}
+  alarmVolume: 0.8
   onRoundStart:
     m_PersistentCalls:
       m_Calls: []
