@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 
 namespace AeAeng
 {
@@ -45,7 +46,8 @@ namespace AeAeng
         [Tooltip("켜질 때 깜빡임 패턴 (켜짐/꺼짐이 번갈아 가며 각 구간의 길이, 초)")]
         public float[] flickerPattern = { 0.05f, 0.08f, 0.04f, 0.12f, 0.06f };
 
-        [SerializeField] bool startOn = false;
+        [Tooltip("씬 시작할 때 불 켜기 (메인 화면: 켬)")]
+        [FormerlySerializedAs("startOn")] public bool startOn = false;
 
         public bool IsOn { get; private set; }
 

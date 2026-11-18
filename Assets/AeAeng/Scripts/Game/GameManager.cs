@@ -44,6 +44,21 @@ namespace AeAeng
             DontDestroyOnLoad(gameObject);
         }
 
+        // Meta 메뉴를 열었다 닫은 뒤 소리가 안 나던 문제 대응: 포커스를 되찾으면 소리를 다시 켜고 상태를 기록
+        void OnApplicationFocus(bool focus)
+        {
+            if (!focus) { Debug.Log("[GameManager] 포커스 잃음 (Meta 메뉴 등)"); return; }
+            if (!PauseMenu.AnyOpen) AudioListener.pause = false;
+            int playing = 0, total = 0;
+            foreach (var s in FindObjectsByType<AudioSource>(FindObjectsSortMode.None))
+            {
+                total++;
+                if (s.isPlaying) playing++;
+            }
+            Debug.Log($"[GameManager] 포커스 되찾음: AudioListener.pause={AudioListener.pause}, volume={AudioListener.volume:0.00}, " +
+                      $"재생 중인 소리 {playing}/{total}, 출력 {AudioSettings.outputSampleRate}Hz");
+        }
+
         public void AddParty(PartyType type)
         {
             if (type == PartyType.Dream) DreamParties++;

@@ -350,5 +350,23 @@ namespace AeAeng
         }
 
         void OnDisable() => ReleaseLanding();
+
+        // Meta 메뉴(녹화 시작 등)를 열었다 닫으면 앱이 포커스를 잃었다 되찾음.
+        // 11/18 헤드셋 테스트에서 그 뒤로 모기 소리가 안 났음 → 포커스를 되찾을 때 소리를 다시 틀어 줌
+        void OnApplicationFocus(bool focus)
+        {
+            if (focus) ResumeAudio();
+        }
+
+        void OnApplicationPause(bool paused)
+        {
+            if (!paused) ResumeAudio();
+        }
+
+        void ResumeAudio()
+        {
+            if (_audio == null || _audio.clip == null || !enabled || Current == State.Caught) return;
+            if (!_audio.isPlaying || _audio.time <= 0f) { _audio.Stop(); _audio.Play(); }
+        }
     }
 }
