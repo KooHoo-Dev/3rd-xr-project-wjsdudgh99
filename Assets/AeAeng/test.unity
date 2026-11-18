@@ -342,7 +342,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1717954561962503726, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.25
       objectReference: {fileID: 0}
     - target: {fileID: 1717954561962503726, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       propertyPath: m_LocalPosition.z
@@ -449,6 +449,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1398016099}
+    - targetCorrespondingSourceObject: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1398016100}
+    - targetCorrespondingSourceObject: {fileID: 1717954561962503725, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1398016107}
   m_SourcePrefab: {fileID: 100100000, guid: f6336ac4ac8b4d34bc5072418cdc62a0, type: 3}
 --- !u!4 &72985295 stripped
 Transform:
@@ -3760,6 +3766,34 @@ MonoBehaviour:
   visualNames:
   - LineVisual
   - Poke Point Affordances
+--- !u!114 &1398016100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1398016092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e30ba98a8c2b57e4689be706afdf2e11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AeAeng.TriggerSelectSwap
+  hand: 2
+--- !u!114 &1398016107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1398016092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 097558051730eaa4c93d33bed4dd7f7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AeAeng.StationaryPlayer
+  seatPosition: {x: 0, y: 0, z: 0}
+  seatYaw: 0
+  recenterOnStart: 1
 --- !u!1001 &1438568123
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3773,8 +3807,20 @@ PrefabInstance:
       value: FlySwatter
       objectReference: {fileID: 0}
     - target: {fileID: 7343898906168757547, guid: d7ea8b60e855314418c08358c71ded99, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7343898906168757547, guid: d7ea8b60e855314418c08358c71ded99, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7343898906168757547, guid: d7ea8b60e855314418c08358c71ded99, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7343898906168757547, guid: d7ea8b60e855314418c08358c71ded99, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.7
+      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: 7343898906168757547, guid: d7ea8b60e855314418c08358c71ded99, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3782,7 +3828,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7343898906168757547, guid: d7ea8b60e855314418c08358c71ded99, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.1
       objectReference: {fileID: 0}
     - target: {fileID: 7343898906168757547, guid: d7ea8b60e855314418c08358c71ded99, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3810,6 +3856,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7343898906168757547, guid: d7ea8b60e855314418c08358c71ded99, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7343898906168757547, guid: d7ea8b60e855314418c08358c71ded99, type: 3}
+      propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

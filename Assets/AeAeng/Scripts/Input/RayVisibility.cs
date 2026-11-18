@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace AeAeng
 {
@@ -43,6 +44,11 @@ namespace AeAeng
         {
             foreach (var line in _lines)
                 if (line != null) line.SetActive(showRays);
+
+            // 레이가 숨겨져 있어도 멀리 있는 물체를 잡을 수 있으면 안 되므로, 게임 중에는 원거리 잡기도 끈다
+            // (파리채는 손을 가까이 가져가야만 잡힘)
+            foreach (var it in GetComponentsInChildren<NearFarInteractor>(true))
+                it.enableFarCasting = showRays;
         }
     }
 }

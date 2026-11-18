@@ -114,9 +114,7 @@ namespace AeAeng.EditorTools
             Box(nightstand, "Lamp_Stem", new Vector3(0.9f, 0.62f, -0.08f), new Vector3(0.02f, 0.2f, 0.02f), mDark);
             Cylinder(nightstand, "Lamp_Shade", new Vector3(0.9f, 0.76f, -0.08f), new Vector3(0.18f, 0.07f, 0.18f), mLampShade);
 
-            var stand = Child(furniture, "SwatterStand (placeholder)");
-            Box(stand, "Base", new Vector3(0.75f, 0.01f, 0.45f), new Vector3(0.2f, 0.02f, 0.2f), mDark);
-            Box(stand, "Post", new Vector3(0.75f, 0.45f, 0.45f), new Vector3(0.03f, 0.9f, 0.03f), mDark);
+            // 파리채 받침대는 없음: 파리채는 책상 위에 직접 놓음 (11/18 결정)
 
             // ---------- 모기 대용 (밝기 확인용 작은 구) ----------
             var mosq = Child(root, "MosquitoDummies");
@@ -205,6 +203,9 @@ namespace AeAeng.EditorTools
                     p.enabled = false;
                     PrefabUtility.RecordPrefabInstancePropertyModifications(p);
                 }
+                // 몸 캡슐이 침대에 밀려 시점이 올라가지 않게 + 실제 앉은 자리를 침대 위로 맞춤 (11/18)
+                if (origin.GetComponent<StationaryPlayer>() == null)
+                    Undo.AddComponent<StationaryPlayer>(origin.gameObject);
 
                 xrCam = origin.Camera != null ? origin.Camera : origin.GetComponentInChildren<Camera>(true);
                 if (xrCam != null)

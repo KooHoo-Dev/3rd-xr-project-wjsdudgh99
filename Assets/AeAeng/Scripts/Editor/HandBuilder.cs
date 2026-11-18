@@ -129,6 +129,7 @@ namespace AeAeng.EditorTools
                 Drive(pose.middle, HandPose.Source.TriggerOrGrip, 0.4f, 1f);
                 Drive(pose.ring, HandPose.Source.TriggerOrGrip, 0.45f, 1f);
                 Drive(pose.little, HandPose.Source.TriggerOrGrip, 0.5f, 1f);
+                SwatterGripSetup.ApplyGrip(root.transform); // 파리채를 쥐는 기준점
             }
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, $"{PrefabDir}/{sideName}Hand.prefab");

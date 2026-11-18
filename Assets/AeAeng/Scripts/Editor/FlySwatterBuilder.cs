@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using Unity.XR.CoreUtils;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace AeAeng.EditorTools
 {
@@ -102,11 +105,25 @@ namespace AeAeng.EditorTools
             grip.localPosition = new Vector3(0f, 0.06f, 0f);
             grip.localRotation = Quaternion.Euler(-90f, 0f, 0f); // forward = 머리 쪽
 
+            // ---- 잡기 (오른손 트리거, 놓으면 제자리로) ----
+            var grab = go.AddComponent<XRGrabInteractable>(); // Rigidbody 자동 추가
+            var rb = go.GetComponent<Rigidbody>();
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            grab.movementType = XRBaseInteractable.MovementType.Instantaneous;
+            grab.throwOnDetach = false;
+            grab.useDynamicAttach = false;
+            grab.trackScale = false;
+            grab.attachTransform = grip;
+            grab.selectMode = InteractableSelectMode.Single;
+            go.AddComponent<SwatterGrab>();
+
             var prefab = PrefabUtility.SaveAsPrefabAsset(go, PrefabPath);
             Object.DestroyImmediate(go);
             AssetDatabase.SaveAssets();
 
             bool placed = PlaceInSceneIfMissing(prefab);
+            EnsureTriggerSelect();
             string preview = RenderPreviews(prefab);
 
             Debug.Log($"[FlySwatterBuilder] verts {md.v.Count}, tris {md.t.Count / 3}, holes {holeCount}, " +
@@ -362,11 +379,39 @@ namespace AeAeng.EditorTools
             }
 
             var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            // 파리채 받침대(placeholder) 꼭대기에 세워 두고, 면이 플레이어 쪽을 보게
+            // 처음 한 번만 놓는 기본 위치. 실제 자리(책상 위)는 씬에서 직접 옮김 → 그 자리가 "제자리"가 됨
             inst.transform.SetPositionAndRotation(new Vector3(0.75f, 0.92f, 0.45f), Quaternion.Euler(0f, -121f, 0f));
             Undo.RegisterCreatedObjectUndo(inst, "Place Fly Swatter");
             EditorSceneManager.MarkSceneDirty(inst.scene);
             return true;
+        }
+
+        /// <summary>XR Origin 에 TriggerSelectSwap(오른손 트리거로 잡기)과 RayVisibility 가 있는지 확인</summary>
+        static void EnsureTriggerSelect()
+        {
+            var origin = Object.FindFirstObjectByType<XROrigin>(FindObjectsInactive.Include);
+            if (origin == null)
+            {
+                Debug.LogWarning("[FlySwatterBuilder] 씬에 XR Origin 이 없어서 오른손 트리거 잡기를 설정하지 못했습니다.");
+                return;
+            }
+            var go = origin.gameObject;
+            if (go.GetComponent<TriggerSelectSwap>() == null)
+            {
+                Undo.AddComponent<TriggerSelectSwap>(go).hand = InteractorHandedness.Right;
+                Debug.Log("[FlySwatterBuilder] XR Origin 에 TriggerSelectSwap 추가 (오른손 트리거 = 잡기)");
+            }
+            if (go.GetComponent<RayVisibility>() == null)
+            {
+                Undo.AddComponent<RayVisibility>(go);
+                Debug.Log("[FlySwatterBuilder] XR Origin 에 RayVisibility 추가 (게임 중 레이 / 원거리 잡기 끔)");
+            }
+            if (go.GetComponent<StationaryPlayer>() == null)
+            {
+                Undo.AddComponent<StationaryPlayer>(go);
+                Debug.Log("[FlySwatterBuilder] XR Origin 에 StationaryPlayer 추가 (시점 상승 방지 + 침대 자리 맞춤)");
+            }
+            EditorSceneManager.MarkSceneDirty(go.scene);
         }
 
         static string RenderPreviews(GameObject prefab)
