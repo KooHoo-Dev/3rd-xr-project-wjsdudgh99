@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8202696843250281361}
   - component: {fileID: 8280967626676186709}
   - component: {fileID: 5164255792954760719}
+  - component: {fileID: 5013084928869941704}
   m_Layer: 0
   m_Name: FlySwatter
   m_TagString: Untagged
@@ -37,6 +38,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4415892749369533980}
+  - {fileID: 6759474004337378747}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5090010350842483728
@@ -309,6 +311,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AeAeng.SwatterGrab
   returnSeconds: 0.2
   handGripName: SwatterGrip
+--- !u!114 &5013084928869941704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3257633204376864432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e6e7133946710042bb8e168b5f13609, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AeAeng.SwatterHit
+  head: {fileID: 2660421223773676253}
+  halfExtents: {x: 0.07, y: 0.08, z: 0.035}
+  minSpeed: 1.5
+  grab: {fileID: 5164255792954760719}
 --- !u!1 &6448233954502094672
 GameObject:
   m_ObjectHideFlags: 0
@@ -340,3 +358,49 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7343898906168757547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6957690425162917252
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6759474004337378747}
+  - component: {fileID: 2660421223773676253}
+  m_Layer: 0
+  m_Name: HeadCenter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6759474004337378747
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6957690425162917252}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.38, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7343898906168757547}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2660421223773676253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6957690425162917252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cb0b57826517df4cad225f08fcce3f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AeAeng.VelocityTracker
+  alertsMosquitoes: 1
+  smoothing: 0.3

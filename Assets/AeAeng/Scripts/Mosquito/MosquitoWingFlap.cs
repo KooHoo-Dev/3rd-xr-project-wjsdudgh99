@@ -13,6 +13,8 @@ namespace AeAeng
         public Transform wingR;
 
         public bool flapping = true;
+        [Tooltip("접힌 채로 날개를 파르르 떪 (눈치챈 순간 0.25초)")]
+        public bool shiver;
 
         [Header("날갯짓")]
         [Tooltip("초당 날갯짓 횟수. 화면 주사율(72~90Hz)보다 충분히 낮아야 깜빡임이 덜함")]
@@ -47,6 +49,7 @@ namespace AeAeng
 
             float flap = dihedral + amplitude * Mathf.Sin(_phase) * _open;
             float angle = Mathf.Lerp(foldedDihedral, flap, _open);
+            if (shiver) angle += 10f * Mathf.Sin(_phase * 2.3f);
             float yaw = Mathf.Lerp(foldedSweep, sweep, _open);
             Apply(wingR, angle, yaw, 1f);
             Apply(wingL, angle, yaw, -1f);

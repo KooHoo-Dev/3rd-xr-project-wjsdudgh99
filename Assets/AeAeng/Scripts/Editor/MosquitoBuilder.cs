@@ -88,6 +88,8 @@ namespace AeAeng.EditorTools
             col.center = new Vector3(0f, 0f, -0.2f) * ModelScale;
             col.radius = 1.6f * ModelScale; // 약 1.2cm (파리채/손 판정용)
 
+            MosquitoSetup.EnsureMosquito(root); // 게임 동작 (FSM, 3D 소리, 넉넉한 판정 콜라이더)
+
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             Object.DestroyImmediate(root);
             AssetDatabase.SaveAssets();
