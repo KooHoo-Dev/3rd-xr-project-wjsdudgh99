@@ -349,7 +349,16 @@ namespace AeAeng
             _landing = null;
         }
 
-        void OnDisable() => ReleaseLanding();
+        void OnEnable() => AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChanged;
+
+        void OnDisable()
+        {
+            AudioSettings.OnAudioConfigurationChanged -= OnAudioConfigurationChanged;
+            ReleaseLanding();
+        }
+
+        // 오디오 출력이 새로 만들어지면(GameManager 가 포커스 복구 때 Reset) 모든 소리가 멈추므로 다시 재생
+        void OnAudioConfigurationChanged(bool deviceWasChanged) => ResumeAudio();
 
         // Meta 메뉴(녹화 시작 등)를 열었다 닫으면 앱이 포커스를 잃었다 되찾음.
         // 11/18 헤드셋 테스트에서 그 뒤로 모기 소리가 안 났음 → 포커스를 되찾을 때 소리를 다시 틀어 줌
