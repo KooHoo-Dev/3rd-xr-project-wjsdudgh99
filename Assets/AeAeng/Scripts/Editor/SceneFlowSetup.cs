@@ -117,8 +117,13 @@ namespace AeAeng.EditorTools
 
         static void MakeFromPlay(string path, System.Action<Camera> setup)
         {
-            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(path) != null) AssetDatabase.DeleteAsset(path);
-            AssetDatabase.CopyAsset(PlayPath, path);
+            // 이미 있으면 파일 내용만 덮어씀 → .meta(GUID)가 그대로라 빌드 목록/참조가 안 바뀜
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(path) != null)
+            {
+                System.IO.File.Copy(PlayPath, path, true);
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            }
+            else AssetDatabase.CopyAsset(PlayPath, path);
             var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
             StripGameplay();
             setup(XrCamera());
