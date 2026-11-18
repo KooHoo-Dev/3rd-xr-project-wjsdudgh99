@@ -12,7 +12,7 @@ namespace AeAeng.EditorTools
     ///     (높이 0.6~2.0m, 등 뒤 머리 쪽 벽 제외, 0.18m 간격). 가구를 옮겼으면 다시 실행.
     ///  2) 모기 프리팹: Mosquito + 3D AudioSource("애앵~" 루프), 판정 콜라이더 넉넉하게
     ///  3) 파리채 프리팹: 채 머리 속도 추적 + SwatterHit
-    ///  4) 오른손: 속도 추적(눈치 판정) + HandCatch(맨손 잡기)
+    ///  4) 오른손: 속도 추적(눈치 판정). HandCatch(맨손 잡기)는 11/18에 빼기로 해서 꺼 둔 채로 붙음
     ///  5) 씬에 MosquitoSwarm (한 판 3마리)
     /// </summary>
     public static class MosquitoSetup
@@ -117,7 +117,10 @@ namespace AeAeng.EditorTools
             var c = go.GetComponent<HandCatch>(); if (c == null) c = Undo.AddComponent<HandCatch>(go);
             c.palm = go.transform.Find(SwatterGripSetup.GripName);
             if (c.palm == null) Debug.LogWarning("[MosquitoSetup] 오른손에 SwatterGrip 이 없습니다. AeAeng > Setup Swatter Grip 을 실행하세요.");
-            return "속도 추적 + 맨손 잡기";
+            // 11/18 결정: 맨손 잡기 뺌. 코드는 남겨 두고 꺼 둠 (다시 쓰려면 이 컴포넌트와 MosquitoSwarm.settings.handCatch 를 켬)
+            Undo.RecordObject(c, "Disable hand catch");
+            c.enabled = false;
+            return "속도 추적 (맨손 잡기는 꺼 둠)";
         }
 
         static bool EnsureSwarm()
@@ -133,6 +136,10 @@ namespace AeAeng.EditorTools
             }
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(MosquitoPrefabPath);
             swarm.prefab = prefab != null ? prefab.GetComponent<Mosquito>() : null;
+            // 11/18 결정: 맨손 잡기 뺌 → 파리채로 어디서든 (씬에 저장된 예전 값 0.4 덮어쓰기)
+            Undo.RecordObject(swarm, "Swatter only");
+            swarm.settings.handCatch = false;
+            swarm.settings.nearZone = 0f;
             EditorUtility.SetDirty(swarm);
             return added;
         }

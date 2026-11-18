@@ -84,8 +84,8 @@ namespace AeAeng
         }
 
         /// <summary>
-        /// 잡기 시도. 머리(HMD)에서의 거리로 방법을 제한 (기획서 거리별 잡기 구간):
-        /// 근거리(0~0.4m) 맨손만, 중거리(0.4~0.7m) 둘 다, 원거리(0.7m~) 파리채만.
+        /// 잡기 시도. 11/18 결정으로 맨손 잡기는 뺌(settings.handCatch = false) → 파리채로만, 거리 제한 없음.
+        /// (맨손을 다시 켜면: 근거리 nearZone 안은 맨손만, handReach 밖은 파리채만)
         /// </summary>
         public bool TryCatch(Method method)
         {
@@ -96,7 +96,7 @@ namespace AeAeng
                 swarm.Message(MosquitoSwarm.Msg.TooClose);
                 return false;
             }
-            if (method == Method.Hand && d > S.handReach) return false;
+            if (method == Method.Hand && (!S.handCatch || d > S.handReach)) return false;
 
             Enter(State.Caught);
             swarm.NotifyCaught(this, method);

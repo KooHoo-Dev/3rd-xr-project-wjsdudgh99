@@ -49,10 +49,12 @@ namespace AeAeng
             [Tooltip("불을 끄고 이 시간(초)이 지나면 숨은 모기가 다시 나옴")]
             public float respawnAfterDark = 5f;
 
-            [Header("잡기 구간 (머리에서 거리)")]
-            [Tooltip("이보다 가까우면 파리채로 못 잡음 (근거리 = 맨손)")]
-            public float nearZone = 0.4f;
-            [Tooltip("이보다 멀면 맨손으로 못 잡음 (원거리 = 파리채)")]
+            [Header("잡기")]
+            [Tooltip("맨손 잡기 사용 (11/18 결정: 뺌 → 파리채로만 잡음)")]
+            public bool handCatch = false;
+            [Tooltip("이보다 가까우면 파리채로 못 잡음. 맨손 잡기를 뺐으므로 0 (어디서든 파리채)")]
+            public float nearZone = 0f;
+            [Tooltip("(맨손 잡기를 켤 때만) 이보다 멀면 맨손으로 못 잡음")]
             public float handReach = 0.7f;
             [Tooltip("잡힌 뒤 납작한 채로 남아 있는 시간 (초)")]
             public float caughtLinger = 1.0f;
