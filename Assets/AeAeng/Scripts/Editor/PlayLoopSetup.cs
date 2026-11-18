@@ -194,7 +194,7 @@ namespace AeAeng.EditorTools
             panel.mainText = main; panel.subText = subT;
             panel.checkIcon = check; panel.windIcon = wind;
             var hl = root.GetComponent<HeadLock>();
-            hl.distance = 1.0f; hl.height = -0.28f; hl.followSpeed = 3f;
+            hl.distance = 1.0f; hl.height = 0.2f; hl.followSpeed = 3f; // 11/18: 시선 아래(-0.28) → 위로 (모기 보는 데 안 가리게)
             return panel;
         }
 

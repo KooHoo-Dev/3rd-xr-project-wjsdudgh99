@@ -19,7 +19,7 @@ namespace AeAeng.EditorTools
     {
         const string MosquitoPrefabPath = "Assets/AeAeng/Prefabs/Mosquito.prefab";
         const string SwatterPrefabPath = "Assets/AeAeng/Prefabs/FlySwatter.prefab";
-        const string BuzzClipPath = "Assets/AeAeng/Sound/freesound_community-single-mosquito-buzz-69360.mp3";
+        const string BuzzClipPath = "Assets/AeAeng/Sound/Mosquito/freesound_community-single-mosquito-buzz-69360.mp3";
         const string LandingRootName = "MosquitoLandingPoints";
 
         // 착지 지점 조건 (기획서 + 11/18 결정: 손 닿는 범위)

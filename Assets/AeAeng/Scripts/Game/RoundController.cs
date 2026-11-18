@@ -24,8 +24,18 @@ namespace AeAeng
         public SubtitlePanel subtitles;
 
         [Header("판")]
-        [Tooltip("한 판의 모기 수 (기획: 3)")]
-        public int mosquitoesPerRound = 3;
+        // 11/18 헤드셋 테스트: 3마리는 파리채 약 35초, 신문지 약 5초 만에 끝남 → 판(3분)이 너무 짧음
+        // → 첫 판 5마리, 판마다 1마리씩 늘려 최대 8마리 (판이 1~2분 걸리고, 늦으면 7시 댄싱 파티도 나오게)
+        [Tooltip("첫 판의 모기 수")]
+        public int firstRoundMosquitoes = 5;
+        [Tooltip("다음 판마다 늘어나는 모기 수")]
+        public int addPerRound = 1;
+        [Tooltip("한 판의 최대 모기 수 (소리가 너무 겹치지 않게)")]
+        public int maxMosquitoes = 8;
+
+        /// <summary>이번 판의 모기 수 (RoundNumber 는 1부터)</summary>
+        public int MosquitoesThisRound =>
+            Mathf.Clamp(firstRoundMosquitoes + addPerRound * (RoundNumber - 1), 1, Mathf.Max(1, maxMosquitoes));
         [Tooltip("플레이를 누르면 바로 첫 판 시작")]
         public bool startOnPlay = true;
 
@@ -99,10 +109,11 @@ namespace AeAeng
             RoundNumber++;
             if (room != null) room.SetLight(false, false);
             if (clock != null) clock.StartRound();
-            if (swarm != null) swarm.SpawnRound(mosquitoesPerRound);
+            int n = MosquitoesThisRound;
+            if (swarm != null) swarm.SpawnRound(n);
             Current = Phase.Playing;
             onRoundStart?.Invoke();
-            Debug.Log($"[RoundController] {RoundNumber}번째 판 시작 (모기 {mosquitoesPerRound}마리)");
+            Debug.Log($"[RoundController] {RoundNumber}번째 판 시작 (모기 {n}마리, 무기 {GameManager.Get().SelectedWeapon})");
         }
 
         void OnAllCaught()
@@ -125,7 +136,7 @@ namespace AeAeng
             if (type == PartyType.Dream)
             {
                 // 모두 잡았다 → 스르르 잠듦
-                if (banner != null) banner.Show("꿈나라 파티!", bannerSeconds + sleepFadeSeconds);
+                if (banner != null) banner.Show(GameManager.DreamTitle, bannerSeconds + sleepFadeSeconds);
                 if (fade != null) yield return fade.FadeTo(1f, sleepFadeSeconds);
                 yield return new WaitForSeconds(bannerSeconds);
             }
@@ -133,7 +144,7 @@ namespace AeAeng
             {
                 // 아침까지 못 잡음 → 남은 모기들이 머리 주변에서 춤춤
                 if (swarm != null) swarm.Dance();
-                if (banner != null) banner.Show("모기와 댄싱 파티!", bannerSeconds);
+                if (banner != null) banner.Show(GameManager.DanceTitle, bannerSeconds);
                 yield return new WaitForSeconds(bannerSeconds + 0.3f);
                 if (fade != null) yield return fade.FadeTo(1f, betweenFadeSeconds);
             }

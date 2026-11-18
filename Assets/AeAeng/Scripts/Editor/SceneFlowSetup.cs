@@ -15,7 +15,7 @@ namespace AeAeng.EditorTools
     /// <summary>
     /// 씬 흐름 만들기 (AeAeng > Build Scene Flow). 플레이 씬을 고친 뒤 다시 실행하면 메인/결과 씬도 새로 만들어짐.
     ///  1) 플레이 씬(test): EventSystem(XR UI), 메인 복귀 확인 창(PauseMenu) + 왼손 길게 누르기 연결
-    ///  2) 메인 씬(Menu): 플레이 씬을 복사해 게임 요소를 빼고, 불 켠 침실 + 제목/제작자/Start/Exit 패널
+    ///  2) 메인 씬(Menu): 플레이 씬을 복사해 게임 요소를 빼고, 불 켠 침실 + 제목/Start/Exit 패널 + 무기 선택창(Start 뒤)
     ///  3) 결과 씬(Result): 플레이 씬을 복사해 게임 요소를 빼고, 아침 햇살 + 파티 횟수 패널
     ///  4) 빌드 목록: Menu → test → Result
     /// 버튼은 오른손 레이로 누름 (XRI TrackedDeviceGraphicRaycaster + XRUIInputModule).
@@ -27,7 +27,6 @@ namespace AeAeng.EditorTools
         const string ResultPath = "Assets/AeAeng/Result.unity";
         const string FontPath = "Assets/99. External Assets/Font/Noto_Sans_KR/NotoSansKR-Regular SDF.asset";
 
-        const string Author = "전영호";
 
         static readonly Color PanelColor = new Color(0.04f, 0.06f, 0.11f, 0.88f);
         static readonly Color TitleColor = new Color(1f, 0.93f, 0.75f);
@@ -163,15 +162,183 @@ namespace AeAeng.EditorTools
             var ctrl = go.AddComponent<MenuController>();
 
             // 정면 약 2m (침대 자리 기준 +Z), 앉은 눈높이보다 조금 위
-            var canvas = MakeCanvas("MenuPanel", null, cam, new Vector2(900, 620), 0.0013f);
+            // 11/18: 제작자 이름 뺌, 무기 버튼은 Start 뒤 무기 선택창으로 옮김
+            var canvas = MakeCanvas("MenuPanel", null, cam, new Vector2(900, 520), 0.0013f);
             canvas.transform.SetPositionAndRotation(SeatFront(2.0f, 1.35f), SeatRotation());
-            Label(canvas.transform, "Title", "애앵~", 170, new Vector2(0, 150), new Vector2(860, 220), TitleColor, FontStyles.Bold);
-            Label(canvas.transform, "Author", Author, 52, new Vector2(0, 30), new Vector2(860, 80), TextColor, FontStyles.Normal);
-            var start = MakeButton(canvas.transform, "Start", "Start", new Vector2(-170, -170), ButtonColor);
-            var exit = MakeButton(canvas.transform, "Exit", "Exit", new Vector2(170, -170), ButtonAltColor);
+            Label(canvas.transform, "Title", "애앵~", 170, new Vector2(0, 90), new Vector2(860, 220), TitleColor, FontStyles.Bold);
+            var start = MakeButton(canvas.transform, "Start", "Start", new Vector2(-170, -140), ButtonColor);
+            var exit = MakeButton(canvas.transform, "Exit", "Exit", new Vector2(170, -140), ButtonAltColor);
             UnityEventTools.AddPersistentListener(start.onClick, ctrl.OnStartButton);
             UnityEventTools.AddPersistentListener(exit.onClick, ctrl.OnExitButton);
+            ctrl.mainPanel = canvas.gameObject;
+
+            ctrl.weaponPanel = BuildWeaponPanel(cam, ctrl);
+            ctrl.weaponPanel.SetActive(false);
             ctrl.fade = Object.FindFirstObjectByType<ScreenFade>(FindObjectsInactive.Include);
+        }
+
+        // ------------------------------------------------------------------
+        // 무기 선택창: 카드 2장 (이름 / 정사각형 이미지 / 스펙 / 시작) + 뒤로
+        // ------------------------------------------------------------------
+
+        const string SwatterPrefabPath = "Assets/AeAeng/Prefabs/FlySwatter.prefab";
+        const string NewspaperPrefabPath = "Assets/AeAeng/Prefabs/Newspaper.prefab";
+        const string IconDir = "Assets/AeAeng/Textures/UI";
+        const float IconOrthoSize = 0.22f;  // 무기 이미지 화면 반 높이 (m)
+        static readonly Color CardColor = new Color(0.10f, 0.12f, 0.19f, 0.95f);
+        static readonly Color IconBgColor = new Color(0.20f, 0.22f, 0.30f, 1f);
+        static readonly Color StartColor = new Color(0.85f, 0.55f, 0.18f, 1f);
+        static readonly Color SpecLabelColor = new Color(0.72f, 0.75f, 0.85f);
+
+        static GameObject BuildWeaponPanel(Camera cam, MenuController ctrl)
+        {
+            var canvas = MakeCanvas("WeaponPanel", null, cam, new Vector2(1100, 1060), 0.0011f);
+            canvas.transform.SetPositionAndRotation(SeatFront(2.0f, 1.35f), SeatRotation());
+            Label(canvas.transform, "Title", "무기를 고르세요", 70, new Vector2(0, 460), new Vector2(1000, 100), TitleColor, FontStyles.Bold);
+
+            var swatterHit = AssetDatabase.LoadAssetAtPath<GameObject>(SwatterPrefabPath)?.GetComponent<SwatterHit>();
+            var paperHit = AssetDatabase.LoadAssetAtPath<GameObject>(NewspaperPrefabPath)?.GetComponent<SwatterHit>();
+
+            var a = WeaponCard(canvas.transform, "Card_FlySwatter", new Vector2(-270, 10), "파리채",
+                RenderWeaponIcon(SwatterPrefabPath, "WeaponIcon_FlySwatter"),
+                new[]
+                {
+                    ("길이", "45cm"),
+                    ("치는 면", "14 x 16cm"),
+                    ("공중 저격 확률", Percent(swatterHit, 0.2f)),
+                    ("스윙 속도", SpeedText(swatterHit, 3.5f)),
+                });
+            var b = WeaponCard(canvas.transform, "Card_Newspaper", new Vector2(270, 10), "신문지",
+                RenderWeaponIcon(NewspaperPrefabPath, "WeaponIcon_Newspaper"),
+                new[]
+                {
+                    ("길이", "32cm"),
+                    ("치는 면", "끝쪽 16cm"),
+                    ("공중 저격 확률", Percent(paperHit, 0.35f)),
+                    ("스윙 속도", SpeedText(paperHit, 3.0f)),
+                });
+            UnityEventTools.AddPersistentListener(a.onClick, ctrl.OnStartFlySwatter);
+            UnityEventTools.AddPersistentListener(b.onClick, ctrl.OnStartNewspaper);
+
+            var back = MakeButton(canvas.transform, "Back", "뒤로", new Vector2(0, -465), ButtonAltColor);
+            UnityEventTools.AddPersistentListener(back.onClick, ctrl.OnBackButton);
+            return canvas.gameObject;
+        }
+
+        static string Percent(SwatterHit hit, float fallback) =>
+            $"{Mathf.RoundToInt((hit != null ? hit.airCatchChance : fallback) * 100f)}%";
+
+        static string SpeedText(SwatterHit hit, float fallback)
+        {
+            float v = hit != null ? hit.minSpeed : fallback;
+            return v >= 3.2f ? "빠르게" : "보통";
+        }
+
+        /// <summary>카드 하나: 이름(위) → 정사각형 이미지 → 스펙 줄 → 시작 버튼. 시작 버튼을 돌려줌</summary>
+        static Button WeaponCard(Transform parent, string name, Vector2 pos, string title, Sprite icon, (string, string)[] specs)
+        {
+            var card = Box(parent, name, pos, new Vector2(500, 820), CardColor);
+            Label(card, "Name", title, 64, new Vector2(0, 350), new Vector2(460, 90), TitleColor, FontStyles.Bold);
+
+            var frame = Box(card, "ImageFrame", new Vector2(0, 125), new Vector2(340, 340), IconBgColor);
+            if (icon != null)
+            {
+                var imgGo = new GameObject("Image", typeof(RectTransform));
+                imgGo.transform.SetParent(frame, false);
+                var rt = (RectTransform)imgGo.transform;
+                rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
+                rt.offsetMin = new Vector2(8, 8); rt.offsetMax = new Vector2(-8, -8);
+                var img = imgGo.AddComponent<Image>();
+                img.sprite = icon;
+                img.preserveAspect = true;
+                img.raycastTarget = false;
+            }
+
+            for (int i = 0; i < specs.Length; i++)
+            {
+                float y = -85 - i * 52;
+                var l = Label(card, "Spec" + i, specs[i].Item1, 38, new Vector2(-10, y), new Vector2(420, 50), SpecLabelColor, FontStyles.Normal);
+                l.alignment = TextAlignmentOptions.Left;
+                var v = Label(card, "Value" + i, specs[i].Item2, 38, new Vector2(10, y), new Vector2(420, 50), TitleColor, FontStyles.Bold);
+                v.alignment = TextAlignmentOptions.Right;
+            }
+
+            var start = MakeButton(card, "Start", "시작", new Vector2(0, -335), StartColor);
+            ((RectTransform)start.transform).sizeDelta = new Vector2(420, 100);
+            ((RectTransform)start.transform.Find("Label")).sizeDelta = new Vector2(420, 100);
+            return start;
+        }
+
+        static RectTransform Box(Transform parent, string name, Vector2 pos, Vector2 size, Color color)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var rt = (RectTransform)go.transform;
+            rt.anchoredPosition = pos;
+            rt.sizeDelta = size;
+            var img = go.AddComponent<Image>();
+            img.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+            img.type = Image.Type.Sliced;
+            img.color = color;
+            img.raycastTarget = false;
+            return rt;
+        }
+
+        /// <summary>무기 프리팹을 비스듬히 세워 정사각형 PNG 로 찍고 Sprite 로 가져옴 (게임 속 무기와 똑같이 보이게)</summary>
+        static Sprite RenderWeaponIcon(string prefabPath, string fileName)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null) { Debug.LogWarning($"[SceneFlow] {prefabPath} 가 없어 무기 이미지를 못 만들었습니다."); return null; }
+            if (!AssetDatabase.IsValidFolder(IconDir)) AssetDatabase.CreateFolder("Assets/AeAeng/Textures", "UI");
+            string path = $"{IconDir}/{fileName}.png";
+
+            var pru = new PreviewRenderUtility();
+            try
+            {
+                var inst = pru.InstantiatePrefabInScene(prefab);
+                inst.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0f, 0f, -35f)); // 머리가 오른쪽 위로
+                var rs = inst.GetComponentsInChildren<Renderer>();
+                if (rs.Length == 0) return null;
+                var bounds = rs[0].bounds;
+                foreach (var r in rs) bounds.Encapsulate(r.bounds);
+
+                var cam = pru.camera;
+                cam.orthographic = true;
+                // 두 무기를 같은 배율로 찍어 크기 차이가 보이게 (파리채 45cm 가 꽉 차는 크기 기준 → 신문지 32cm 는 약 70%)
+                cam.orthographicSize = IconOrthoSize;
+                cam.nearClipPlane = 0.01f;
+                cam.farClipPlane = 10f;
+                cam.clearFlags = CameraClearFlags.SolidColor;
+                cam.backgroundColor = IconBgColor;
+                cam.transform.SetPositionAndRotation(bounds.center + Vector3.back * 2f, Quaternion.identity);
+                pru.lights[0].intensity = 1.2f;
+                pru.lights[0].transform.rotation = Quaternion.Euler(30f, 25f, 0f);
+                pru.lights[1].intensity = 0.6f;
+                pru.ambientColor = new Color(0.40f, 0.40f, 0.45f);
+
+                pru.BeginStaticPreview(new Rect(0, 0, 512, 512));
+                pru.Render(true, false);
+                var tex = pru.EndStaticPreview();
+                System.IO.File.WriteAllBytes(path, tex.EncodeToPNG());
+                Object.DestroyImmediate(tex);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[SceneFlow] 무기 이미지 렌더 실패 ({fileName}): {e}");
+                return null;
+            }
+            finally
+            {
+                pru.Cleanup();
+            }
+
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.mipmapEnabled = false;
+            importer.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
         }
 
         static void SetupResultScene(Camera cam)
@@ -184,8 +351,8 @@ namespace AeAeng.EditorTools
             var canvas = MakeCanvas("ResultPanel", null, cam, new Vector2(900, 620), 0.0013f);
             canvas.transform.SetPositionAndRotation(SeatFront(2.0f, 1.35f), SeatRotation());
             Label(canvas.transform, "Title", "오늘 밤의 기록", 80, new Vector2(0, 200), new Vector2(860, 120), TitleColor, FontStyles.Bold);
-            ctrl.dreamText = Label(canvas.transform, "Dream", "꿈나라 파티  0번", 64, new Vector2(0, 60), new Vector2(860, 100), TextColor, FontStyles.Normal);
-            ctrl.danceText = Label(canvas.transform, "Dance", "모기와 댄싱 파티  0번", 64, new Vector2(0, -40), new Vector2(860, 100), TextColor, FontStyles.Normal);
+            ctrl.dreamText = Label(canvas.transform, "Dream", "꿀잠  0번", 64, new Vector2(0, 60), new Vector2(860, 100), TextColor, FontStyles.Normal);
+            ctrl.danceText = Label(canvas.transform, "Dance", "밤샘  0번", 64, new Vector2(0, -40), new Vector2(860, 100), TextColor, FontStyles.Normal);
             ctrl.hintText = Label(canvas.transform, "Hint", "아무 버튼이나 눌러 메인으로", 44, new Vector2(0, -210), new Vector2(860, 80), new Color(0.75f, 0.9f, 1f), FontStyles.Italic);
             ctrl.fade = Object.FindFirstObjectByType<ScreenFade>(FindObjectsInactive.Include);
         }

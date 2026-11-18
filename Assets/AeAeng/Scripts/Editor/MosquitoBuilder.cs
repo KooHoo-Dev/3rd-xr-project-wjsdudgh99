@@ -22,6 +22,7 @@ namespace AeAeng.EditorTools
         const string PreviewDir = "Temp/MosquitoPreview";
 
         const float ModelScale = 0.0075f; // 모델 1단위 = 7.5mm
+        const float RootScale = 0.8f;     // 프리팹 루트 크기 (Mosquito.cs 가 이 값을 기준으로 착지 찌그러짐 등을 계산)
 
         // 서브메쉬(재질) 번호
         const int SubBody = 0, SubStripe = 1, SubEyeWhite = 2, SubPupil = 3, SubCount = 4;
@@ -66,6 +67,8 @@ namespace AeAeng.EditorTools
 
             // ---- 프리팹 ----
             var root = new GameObject("Mosquito");
+            // 11/18 헤드셋 테스트: 너무 잘 잡혀서 몸과 판정 콜라이더를 함께 0.8배 (몸 약 2.4cm, 판정 반지름 2.8cm)
+            root.transform.localScale = Vector3.one * RootScale;
 
             var bodyGo = new GameObject("Body");
             bodyGo.transform.SetParent(root.transform, false);

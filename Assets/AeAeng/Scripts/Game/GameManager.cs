@@ -6,6 +6,9 @@ namespace AeAeng
 {
     public enum PartyType { Dream, Dance }
 
+    /// <summary>메인 화면에서 고르는 무기 (11/18 중간 피드백: 돌돌 만 신문지 추가)</summary>
+    public enum Weapon { FlySwatter, Newspaper }
+
     /// <summary>
     /// 씬이 바뀌어도 남는 기록 (기획서 3.3). DontDestroyOnLoad.
     /// - 꿈나라 파티 횟수, 모기와 댄싱 파티 횟수 (플레이 → 결과 화면으로 전달)
@@ -17,9 +20,26 @@ namespace AeAeng
     {
         public static GameManager Instance { get; private set; }
 
+        // 엔딩 문구 (11/18: "꿈나라 파티!" / "모기와 댄싱 파티!" 에서 바꿈). 판 끝 배너는 긴 문구(두 줄), 결과 화면과 손목 UI는 짧은 이름
+        public const string DreamShort = "꿀잠";
+        public const string DanceShort = "밤샘";
+        public const string DreamTitle = "다 잡았다!\n오늘 밤은 꿀잠이다!";
+        public const string DanceTitle = "못 잡았다...\n오늘 하루는 글렀다...";
+
         public int DreamParties { get; private set; }
         public int DanceParties { get; private set; }
         public bool TutorialDone { get; set; }
+
+        /// <summary>메인 화면에서 고른 무기. 메인으로 돌아와도 유지 (ResetRecords 에서 안 지움)</summary>
+        public Weapon SelectedWeapon { get; private set; } = Weapon.FlySwatter;
+
+        public void SetWeapon(Weapon weapon)
+        {
+            if (SelectedWeapon == weapon) return;
+            SelectedWeapon = weapon;
+            Debug.Log($"[GameManager] 무기 선택: {weapon}");
+            Changed?.Invoke();
+        }
 
         [Tooltip("Meta 메뉴를 다녀와서 포커스를 되찾으면 오디오 출력을 다시 시작 (녹화 시작 뒤 소리가 끊기던 문제)")]
         public bool restartAudioOnFocus = true;

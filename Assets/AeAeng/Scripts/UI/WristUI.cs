@@ -31,7 +31,7 @@ namespace AeAeng
             if (caught == _caught && total == _total && dream == _dream && dance == _dance) return;
 
             _caught = caught; _total = total; _dream = dream; _dance = dance;
-            text.text = $"<size=140%>모기 {caught} / {total}</size>\n<size=80%>꿈나라 {dream} · 댄싱 {dance}</size>";
+            text.text = $"<size=140%>모기 {caught} / {total}</size>\n<size=80%>{GameManager.DreamShort} {dream} · {GameManager.DanceShort} {dance}</size>";
         }
     }
 }

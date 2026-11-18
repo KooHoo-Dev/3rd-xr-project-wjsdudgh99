@@ -50,8 +50,8 @@ namespace AeAeng
             Time.timeScale = 1f;
             AudioListener.pause = false;
             var gm = GameManager.Get();
-            if (dreamText != null) dreamText.text = $"꿈나라 파티  <b>{gm.DreamParties}</b>번";
-            if (danceText != null) danceText.text = $"모기와 댄싱 파티  <b>{gm.DanceParties}</b>번";
+            if (dreamText != null) dreamText.text = $"{GameManager.DreamShort}  <b>{gm.DreamParties}</b>번";
+            if (danceText != null) danceText.text = $"{GameManager.DanceShort}  <b>{gm.DanceParties}</b>번";
             if (hintText != null) hintText.alpha = 0f;
 
             if (fade != null)
