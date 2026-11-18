@@ -66,14 +66,8 @@ namespace AeAeng.EditorTools
             var mFloor = LitMat("Floor", new Color(0.45f, 0.33f, 0.24f));
             var mCeiling = LitMat("Ceiling", new Color(0.85f, 0.85f, 0.83f));
             var mWood = LitMat("Wood", new Color(0.50f, 0.36f, 0.25f));
-            var mMattress = LitMat("Mattress", new Color(0.88f, 0.88f, 0.86f));
-            var mBlanket = LitMat("Blanket", new Color(0.35f, 0.45f, 0.65f));
-            var mPillow = LitMat("Pillow", new Color(0.92f, 0.92f, 0.90f));
             var mDark = LitMat("DarkPlastic", new Color(0.10f, 0.10f, 0.11f));
-            var mLampShade = LitMat("LampShade", new Color(0.90f, 0.85f, 0.70f));
-            var mMosquito = LitMat("MosquitoDummy", new Color(0.12f, 0.12f, 0.12f));
             var mWindow = UnlitMat("WindowMoon", new Color(0.16f, 0.22f, 0.38f));
-            var mClock = UnlitMat("ClockDigits", new Color(0.85f, 0.08f, 0.05f));
             var mPanel = UnlitMat("CeilingPanel", new Color(0.95f, 0.97f, 1f));
 
             // ---------- 방 ----------
@@ -82,7 +76,7 @@ namespace AeAeng.EditorTools
             Box(room, "Floor", new Vector3(cx, -Wall / 2, cz), new Vector3(w + Wall * 2, Wall, d + Wall * 2), mFloor);
             Box(room, "Ceiling", new Vector3(cx, Height + Wall / 2, cz), new Vector3(w + Wall * 2, Wall, d + Wall * 2), mCeiling);
             bool realWindow = BuildWalls(room, mWall);
-            BuildNightSky(room);
+            var skyRenderer = BuildNightSky(room);
 
             // 창문 애셋이 없을 때만 가짜 창문 (왼쪽 벽, 달빛 느낌의 Unlit 면 + 창살)
             var window = Child(room, "Window (fake)");
@@ -97,32 +91,10 @@ namespace AeAeng.EditorTools
             }
 
             // ---------- 가구 ----------
-            var furniture = Child(root, "Furniture");
-            var bed = Child(furniture, "Bed");
-            Box(bed, "Frame", new Vector3(-0.05f, 0.15f, 0.575f), new Vector3(1.1f, 0.3f, 2.05f), mWood);
-            Box(bed, "Mattress", new Vector3(-0.05f, 0.4f, 0.575f), new Vector3(1.05f, 0.2f, 2.0f), mMattress);
-            Box(bed, "Blanket", new Vector3(-0.05f, 0.53f, 0.95f), new Vector3(1.08f, 0.06f, 1.25f), mBlanket);
-            Box(bed, "Pillow", new Vector3(-0.05f, 0.56f, -0.2f), new Vector3(0.6f, 0.12f, 0.35f), mPillow);
-            Box(bed, "Headboard", new Vector3(-0.05f, 0.5f, Back + 0.03f), new Vector3(1.1f, 1.0f, 0.06f), mWood);
+            // 상자 가구(침대/협탁/스탠드/시계)는 11/18에 뺌: 실제 가구(침대, 책상 등)를 씬 루트에 직접 배치함.
+            // 파리채 받침대도 없음: 파리채는 책상 위에 직접 놓음.
 
-            var nightstand = Child(furniture, "Nightstand");
-            Box(nightstand, "Body", new Vector3(0.8f, 0.25f, 0.0f), new Vector3(0.45f, 0.5f, 0.4f), mWood);
-            // 시계 화면은 침대 쪽(-X)을 바라봄
-            var clock = Box(nightstand, "DigitalClock", new Vector3(0.72f, 0.545f, 0.08f), new Vector3(0.06f, 0.09f, 0.18f), mDark);
-            Box(clock, "Digits", new Vector3(-0.51f, 0f, 0f), new Vector3(0.02f, 0.6f, 0.8f), mClock, collider: false, local: true);
-            Box(nightstand, "Lamp_Base", new Vector3(0.9f, 0.51f, -0.08f), new Vector3(0.1f, 0.02f, 0.1f), mDark);
-            Box(nightstand, "Lamp_Stem", new Vector3(0.9f, 0.62f, -0.08f), new Vector3(0.02f, 0.2f, 0.02f), mDark);
-            Cylinder(nightstand, "Lamp_Shade", new Vector3(0.9f, 0.76f, -0.08f), new Vector3(0.18f, 0.07f, 0.18f), mLampShade);
-
-            // 파리채 받침대는 없음: 파리채는 책상 위에 직접 놓음 (11/18 결정)
-
-            // ---------- 모기 대용 (밝기 확인용 작은 구) ----------
-            var mosq = Child(root, "MosquitoDummies");
-            Sphere(mosq, "Dummy_LeftWall_Low", new Vector3(Left + 0.015f, 1.15f, 0.45f), mMosquito);
-            Sphere(mosq, "Dummy_LeftWall_High", new Vector3(Left + 0.015f, 1.85f, 0.9f), mMosquito);
-            Sphere(mosq, "Dummy_Blanket", new Vector3(0.15f, 0.575f, 1.15f), mMosquito);
-            Sphere(mosq, "Dummy_LampShade", new Vector3(0.9f, 0.76f, 0.025f), mMosquito);
-            Sphere(mosq, "Dummy_Ceiling", new Vector3(0.4f, Height - 0.015f, 0.8f), mMosquito);
+            // 모기 대용 구(밝기 확인용)도 11/18에 뺌: 실제 모기 프리팹(Prefabs/Mosquito)을 씀.
 
             // ---------- 조명 ----------
             var lighting = Child(root, "Lighting");
@@ -160,6 +132,13 @@ namespace AeAeng.EditorTools
 
             var sw = lighting.AddComponent<LightSwitchInput>();
             sw.room = controller;
+
+            // 게임 시각 5시 30분(판 끝나기 45초 전)부터 창밖에 해가 뜸 (11/18)
+            var sunrise = lighting.AddComponent<SunriseController>();
+            sunrise.startHour = 5.5f;
+            sunrise.room = controller;
+            sunrise.sky = skyRenderer;
+            sunrise.roundClock = Object.FindFirstObjectByType<RoundClock>(FindObjectsInactive.Include);
 
             // ---------- 렌더 설정 (씬 단위) ----------
             RenderSettings.skybox = null;
@@ -269,14 +248,16 @@ namespace AeAeng.EditorTools
         // ================= 창밖 / 그림자 =================
 
         /// <summary>창밖이 검은 허공으로 보이지 않게 밤하늘 면 (그림자 X, 달빛을 막지 않음)</summary>
-        static void BuildNightSky(GameObject room)
+        static Renderer BuildNightSky(GameObject room)
         {
             var mSky = UnlitMat("NightSky", new Color(0.05f, 0.08f, 0.18f));
             var outside = Child(room, "Outside");
             float x = Left - Wall - 1.5f;
             var sky = Box(outside, "NightSky", new Vector3(x, Height * 0.5f, (Back + Front) * 0.5f),
                 new Vector3(0.02f, 6f, 8f), mSky, collider: false);
-            sky.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.Off;
+            var r = sky.GetComponent<Renderer>();
+            r.shadowCastingMode = ShadowCastingMode.Off;
+            return r;
         }
 
         /// <summary>그림자 거리를 방 크기에 맞게 줄임 (50m → 8m: 3m 방에서 그림자가 선명, Quest 부담 감소)</summary>

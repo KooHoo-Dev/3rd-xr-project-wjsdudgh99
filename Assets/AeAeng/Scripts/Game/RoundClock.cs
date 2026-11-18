@@ -56,6 +56,19 @@ namespace AeAeng
             Debug.Log($"[RoundClock] 판 시작 {startHour}:00 → {endHour}:00, {roundSeconds:0}초");
         }
 
+        /// <summary>지금 게임 시각 (시간 단위, 예: 5.5 = 5시 30분)</summary>
+        public float GameHour => startHour + Progress01 * (endHour - startHour);
+
+        /// <summary>게임 시각을 바로 옮김 (테스트용: 에디터 인스펙터 버튼). 7시로 옮기면 바로 판이 끝남.</summary>
+        public void JumpToHour(float hour)
+        {
+            float t = Mathf.Clamp01(Mathf.InverseLerp(startHour, endHour, hour));
+            Elapsed = t * roundSeconds;
+            IsRunning = true; // 7시면 다음 Update 에서 onMorning
+            Apply();
+            Debug.Log($"[RoundClock] 시간 이동 → {GameTime:h:mm} (남은 {Remaining:0}초)");
+        }
+
         /// <summary>판을 끝내고 시계를 실제 시각으로 되돌린다 (메인 화면 / 결과 화면).</summary>
         public void StopRound()
         {
