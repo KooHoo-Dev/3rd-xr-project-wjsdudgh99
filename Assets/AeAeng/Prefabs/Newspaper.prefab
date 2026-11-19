@@ -324,6 +324,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AeAeng.SwatterGrab
   returnSeconds: 0.2
   handGripName: SwatterGrip
+  dropClip: {fileID: 8300000, guid: ed0db30f39ba4745b6c984282915cf0c, type: 3}
+  dropVolume: 0.7
 --- !u!114 &1325494603738672256
 MonoBehaviour:
   m_ObjectHideFlags: 0

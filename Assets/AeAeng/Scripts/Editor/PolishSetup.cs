@@ -11,7 +11,7 @@ namespace AeAeng.EditorTools
     /// <summary>
     /// 3묶음 손맛과 마무리 (AeAeng > Setup Polish). 플레이 씬(test)에서 실행. 다시 실행해도 됨.
     ///  1) TutorialController (메인 Tutorial 버튼으로 들어왔을 때만 동작)
-    ///  2) CatchEffects: 잡을 때 "딱!/퍽!" 글자 + 먼지 파티클
+    ///  2) CatchEffects: 잡을 때 "챱!/퍽!" 글자 + 먼지 파티클
     ///  3) 무기 프리팹(파리채/신문지)에 SwingTrail: 휘두를 때 궤적 + 잡기/놓기 진동
     ///  4) 왼손 무선 스위치 소품 (LightSwitchRemote): 트리거만큼 버튼이 눌리고, 불 상태 LED
     /// 메인 화면 Tutorial 버튼은 AeAeng > Build Scene Flow 를 다시 실행하면 생김.
@@ -100,7 +100,14 @@ namespace AeAeng.EditorTools
             if (trail == null) trail = weaponRoot.AddComponent<SwingTrail>();
             EnsureFolder(UiMatDir);
             trail.trailMaterial = TrailMaterial();
+
+            // 11/19: 책상에 내려놓는 "탁" (원본 wallet_drop_on_table 에서 1.875~2.60초만 잘라 모노 -3dB 로 만든 파일)
+            var grab = weaponRoot.GetComponent<SwatterGrab>();
+            if (grab != null && grab.dropClip == null)
+                grab.dropClip = AssetDatabase.LoadAssetAtPath<AudioClip>(DropClipPath);
         }
+
+        public const string DropClipPath = "Assets/AeAeng/Sound/Drop/drop_tak.wav";
 
         // ------------------------------------------------------------------
         // 재질 (URP Particles/Unlit 반투명) — 씬/프리팹에서 참조해야 빌드에 셰이더가 들어감

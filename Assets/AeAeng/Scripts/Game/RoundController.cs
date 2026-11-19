@@ -54,6 +54,12 @@ namespace AeAeng
         [Range(0f, 1f)] public float alarmVolume = 0.8f;
         AudioSource _alarm;
 
+        [Header("꿀잠 소리 (11/19)")]
+        [Tooltip("모기를 다 잡았을 때(꿀잠 엔딩)와 튜토리얼 완료 때 울리는 소리. 머리에서 들리는 2D")]
+        public AudioClip clearClip;
+        [Range(0f, 1f)] public float clearVolume = 0.8f;
+        AudioSource _clear;
+
         [Header("이벤트 (효과음/햅틱 묶음에서 연결)")]
         public UnityEvent onRoundStart;
         public UnityEvent<PartyType> onParty;
@@ -91,6 +97,20 @@ namespace AeAeng
             _alarm.minDistance = 1.0f;
             _alarm.maxDistance = 8f;
             _alarm.dopplerLevel = 0f;
+        }
+
+        /// <summary>꿀잠 소리 한 번 (꿀잠 엔딩, 튜토리얼 완료)</summary>
+        public void PlayClear()
+        {
+            if (clearClip == null) return;
+            if (_clear == null)
+            {
+                _clear = gameObject.AddComponent<AudioSource>();
+                _clear.playOnAwake = false;
+                _clear.loop = false;
+                _clear.spatialBlend = 0f;
+            }
+            _clear.PlayOneShot(clearClip, clearVolume);
         }
 
         void StopAlarm()
@@ -170,7 +190,8 @@ namespace AeAeng
 
             if (type == PartyType.Dream)
             {
-                // 모두 잡았다 → 스르르 잠듦
+                // 모두 잡았다 → 꿀잠 소리 + 스르르 잠듦
+                PlayClear();
                 if (banner != null) banner.Show(GameManager.DreamTitle, bannerSeconds + sleepFadeSeconds);
                 if (fade != null) yield return fade.FadeTo(1f, sleepFadeSeconds);
                 yield return new WaitForSeconds(bannerSeconds);

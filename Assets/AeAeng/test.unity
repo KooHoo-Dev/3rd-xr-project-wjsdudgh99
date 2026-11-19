@@ -2473,6 +2473,8 @@ MonoBehaviour:
   wakeFadeSeconds: 1.2
   alarmClip: {fileID: 8300000, guid: 287e8362a50e85749ae6fc7bfe8f39dc, type: 3}
   alarmVolume: 0.8
+  clearClip: {fileID: 8300000, guid: e8561759579cb1342b49c186f4d4132a, type: 3}
+  clearVolume: 0.8
   onRoundStart:
     m_PersistentCalls:
       m_Calls: []

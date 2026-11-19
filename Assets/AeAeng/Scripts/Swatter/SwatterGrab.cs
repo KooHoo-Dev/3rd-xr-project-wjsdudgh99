@@ -21,6 +21,12 @@ namespace AeAeng
         [Tooltip("손 안에서 찾을 기준점 이름")]
         public string handGripName = "SwatterGrip";
 
+        [Header("책상에 내려놓는 소리 (11/19)")]
+        [Tooltip("놓은 무기가 책상 위 제자리에 닿을 때 \"탁\" (무기 자리에서 나는 3D 소리)")]
+        public AudioClip dropClip;
+        [Range(0f, 1f)] public float dropVolume = 0.7f;
+        AudioSource _dropAudio;
+
         public bool IsHeld => _grab != null && _grab.isSelected;
 
         XRGrabInteractable _grab;
@@ -115,6 +121,24 @@ namespace AeAeng
             }
             transform.SetPositionAndRotation(_restPos, _restRot);
             _return = null;
+            PlayDrop();
+        }
+
+        void PlayDrop()
+        {
+            if (dropClip == null) return;
+            if (_dropAudio == null)
+            {
+                _dropAudio = gameObject.AddComponent<AudioSource>();
+                _dropAudio.playOnAwake = false;
+                _dropAudio.loop = false;
+                _dropAudio.spatialBlend = 1f;
+                _dropAudio.rolloffMode = AudioRolloffMode.Logarithmic;
+                _dropAudio.minDistance = 0.5f;
+                _dropAudio.maxDistance = 6f;
+                _dropAudio.dopplerLevel = 0f;
+            }
+            _dropAudio.PlayOneShot(dropClip, dropVolume);
         }
     }
 }

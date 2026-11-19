@@ -112,6 +112,8 @@ namespace AeAeng
             Step = 6;
             Debug.Log("[Tutorial] 완료");
             GameManager.Get().TutorialDone = true;
+            var round = FindFirstObjectByType<RoundController>();
+            if (round != null) round.PlayClear(); // 꿀잠 엔딩과 같은 소리
             if (toast != null) toast.Show("잡았다!", "이제 메인에서 Start 로 진짜 게임을 해 보세요", SubtitlePanel.Style.Catch, endSeconds);
             if (banner != null) banner.Show("튜토리얼 완료!", endSeconds);
             yield return new WaitForSeconds(endSeconds);

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace AeAeng
 {
     /// <summary>
-    /// 모기를 잡았을 때 이펙트 (기획서 5.1): 잡은 자리에서 "딱!"(파리채) / "퍽!"(신문지) 글자가 톡 튀어나와
+    /// 모기를 잡았을 때 이펙트 (기획서 5.1): 잡은 자리에서 "챱!"(파리채) / "퍽!"(신문지) 글자가 톡 튀어나와
     /// 위로 떠오르며 사라지고, 작은 먼지 파티클이 퍼진다. 모기 자체는 Mosquito 가 납작해지거나 떨어짐.
     /// 글자와 파티클은 미리 몇 개 만들어 돌려 씀 (Quest 에서 생성/파괴 비용 없음).
     /// </summary>
@@ -68,7 +68,7 @@ namespace AeAeng
             var burst = _bursts[i];
             burst.transform.position = pos;
             burst.Play();
-            StartCoroutine(PopText(_texts[i], pos, paper ? "퍽!" : "딱!", paper ? newspaperColor : swatterColor));
+            StartCoroutine(PopText(_texts[i], pos, paper ? "퍽!" : "챱!", paper ? newspaperColor : swatterColor));
         }
 
         IEnumerator PopText(TextMeshPro t, Vector3 pos, string word, Color color)
