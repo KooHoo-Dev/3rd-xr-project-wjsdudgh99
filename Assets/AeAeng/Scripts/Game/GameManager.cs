@@ -30,6 +30,18 @@ namespace AeAeng
         public int DanceParties { get; private set; }
         public bool TutorialDone { get; set; }
 
+        /// <summary>
+        /// 11/19: 메인 화면 Tutorial 버튼으로 들어온 연습 모드 (강제 튜토리얼 대신 고를 수 있게).
+        /// 플레이 씬에서 RoundController 대신 TutorialController 가 진행. Start 로 들어가면 false.
+        /// </summary>
+        public bool TutorialMode { get; private set; }
+
+        public void SetTutorialMode(bool on)
+        {
+            TutorialMode = on;
+            Debug.Log($"[GameManager] 튜토리얼 모드: {on}");
+        }
+
         /// <summary>메인 화면에서 고른 무기. 메인으로 돌아와도 유지 (ResetRecords 에서 안 지움)</summary>
         public Weapon SelectedWeapon { get; private set; } = Weapon.FlySwatter;
 

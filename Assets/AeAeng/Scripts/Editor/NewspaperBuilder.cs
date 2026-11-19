@@ -401,6 +401,7 @@ namespace AeAeng.EditorTools
             hit.hitHapticAmplitude = 1.0f;   // "세게": 파리채(0.6)보다 강하고 길게
             hit.hitHapticDuration = 0.14f;
             if (whip != null) hit.swingAudio = EnsureSwingAudio(head, whip, pitch: 0.75f, volume: 1.0f); // 낮고 묵직한 "휙"
+            PolishSetup.EnsureSwingTrail(go); // 11/19: 휘두를 때 궤적 + 잡기/놓기 진동
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(go, PrefabPath);
             Object.DestroyImmediate(go);

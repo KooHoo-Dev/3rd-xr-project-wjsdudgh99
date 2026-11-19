@@ -131,9 +131,34 @@ namespace AeAeng
             if (spawnOnStart) SpawnRound(count);
         }
 
+        [Header("귓가 진동 (기획서 5.3: 모기가 아주 가까이 오면 아주 약하게 떨림)")]
+        public float nearHapticDistance = 0.22f;
+        [Range(0f, 1f)] public float nearHapticAmplitude = 0.07f;
+        public float nearHapticInterval = 0.25f;
+        float _nextNearHaptic;
+
         void Update()
         {
             LightOffSeconds = LightOn ? 0f : LightOffSeconds + Time.deltaTime;
+            NearEarHaptic();
+        }
+
+        void NearEarHaptic()
+        {
+            if (nearHapticAmplitude <= 0f || Time.time < _nextNearHaptic || head == null) return;
+            var h = HeadPosition;
+            foreach (var m in _active)
+            {
+                if (m == null || !m.isActiveAndEnabled) continue;
+                var s = m.Current;
+                if (s != Mosquito.State.Fly && s != Mosquito.State.Approach) continue;
+                if ((m.transform.position - h).sqrMagnitude > nearHapticDistance * nearHapticDistance) continue;
+                _nextNearHaptic = Time.time + nearHapticInterval;
+                foreach (var usage in new[] { UnityEngine.InputSystem.CommonUsages.LeftHand, UnityEngine.InputSystem.CommonUsages.RightHand })
+                    UnityEngine.InputSystem.InputSystem.GetDevice<UnityEngine.InputSystem.XR.XRControllerWithRumble>(usage)
+                        ?.SendImpulse(nearHapticAmplitude, nearHapticInterval * 0.6f);
+                return;
+            }
         }
 
         // ------------------------------------------------------------------

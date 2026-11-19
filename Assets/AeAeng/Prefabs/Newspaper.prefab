@@ -47,6 +47,7 @@ GameObject:
   - component: {fileID: 6741566170495942203}
   - component: {fileID: 312187489946512575}
   - component: {fileID: 1325494603738672256}
+  - component: {fileID: 3031932631300967822}
   m_Layer: 0
   m_Name: Newspaper
   m_TagString: Untagged
@@ -345,8 +346,29 @@ MonoBehaviour:
   swingSpeed: 3
   swingCooldown: 0.4
   swingStartTime: 0.24
+  rearmRatio: 0.5
   hitHapticAmplitude: 1
   hitHapticDuration: 0.14
+--- !u!114 &3031932631300967822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4085612816580614141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ece97f4b4ddfd8342b9fc02b210b75c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AeAeng.SwingTrail
+  trailMaterial: {fileID: 2100000, guid: 3e08e2b1451aefd46aa1888a4dd1064c, type: 2}
+  minSpeed: 0
+  trailSeconds: 0.12
+  width: 0.05
+  color: {r: 0.85, g: 0.92, b: 1, a: 0.35}
+  grabHaptic: 0.25
+  releaseHaptic: 0.12
+  hapticSeconds: 0.04
 --- !u!1 &8067956789481249666
 GameObject:
   m_ObjectHideFlags: 0

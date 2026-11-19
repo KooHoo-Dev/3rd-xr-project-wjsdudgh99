@@ -165,8 +165,12 @@ namespace AeAeng.EditorTools
             var canvas = MakeCanvas("MenuPanel", null, cam, new Vector2(900, 520), 0.0013f);
             canvas.transform.SetPositionAndRotation(SeatFront(2.0f, 1.35f), SeatRotation());
             Label(canvas.transform, "Title", "애~앵", 170, new Vector2(0, 90), new Vector2(860, 220), TitleColor, FontStyles.Bold);
-            var start = MakeButton(canvas.transform, "Start", "Start", new Vector2(-170, -140), ButtonColor);
-            var exit = MakeButton(canvas.transform, "Exit", "Exit", new Vector2(170, -140), ButtonAltColor);
+            // 11/19: Tutorial / Start / Exit (튜토리얼은 강제가 아니라 고를 수 있게)
+            var tutorial = MakeButton(canvas.transform, "Tutorial", "Tutorial", new Vector2(-300, -140), ButtonAltColor);
+            var start = MakeButton(canvas.transform, "Start", "Start", new Vector2(0, -140), ButtonColor);
+            var exit = MakeButton(canvas.transform, "Exit", "Exit", new Vector2(300, -140), ButtonAltColor);
+            foreach (var b in new[] { tutorial, start, exit }) ((RectTransform)b.transform).sizeDelta = new Vector2(260, 110);
+            UnityEventTools.AddPersistentListener(tutorial.onClick, ctrl.OnTutorialButton);
             UnityEventTools.AddPersistentListener(start.onClick, ctrl.OnStartButton);
             UnityEventTools.AddPersistentListener(exit.onClick, ctrl.OnExitButton);
             ctrl.mainPanel = canvas.gameObject;

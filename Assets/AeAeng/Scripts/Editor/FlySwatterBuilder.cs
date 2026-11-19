@@ -118,6 +118,7 @@ namespace AeAeng.EditorTools
             grab.selectMode = InteractableSelectMode.Single;
             go.AddComponent<SwatterGrab>();
             MosquitoSetup.EnsureSwatterHit(go); // 채 머리 속도 추적 + 모기 치기 판정
+            PolishSetup.EnsureSwingTrail(go);   // 11/19: 휘두를 때 궤적 + 잡기/놓기 진동
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(go, PrefabPath);
             Object.DestroyImmediate(go);

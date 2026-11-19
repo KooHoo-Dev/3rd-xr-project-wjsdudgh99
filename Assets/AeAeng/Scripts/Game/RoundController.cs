@@ -124,6 +124,8 @@ namespace AeAeng
 
         void Start()
         {
+            // 튜토리얼 모드면 판을 시작하지 않음 (TutorialController 가 진행)
+            if (GameManager.Get().TutorialMode) return;
             if (startOnPlay) StartCoroutine(FirstRound());
         }
 

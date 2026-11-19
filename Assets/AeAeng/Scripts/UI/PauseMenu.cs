@@ -89,7 +89,9 @@ namespace AeAeng
             IsOpen = false;
             AnyOpen = false;
             panel.SetActive(false);
-            GameFlow.LoadResult(); // timeScale / 소리는 GameFlow 가 되돌림
+            // 튜토리얼 중이면 기록이 없으니 결과 대신 메인으로 (timeScale / 소리는 GameFlow 가 되돌림)
+            if (GameManager.Get().TutorialMode) GameFlow.LoadMenu();
+            else GameFlow.LoadResult();
         }
     }
 }

@@ -39,9 +39,18 @@ namespace AeAeng
             }
         }
 
-        // ---- 메인 ----
+        // ---- 메인 (Tutorial / Start / Exit) ----
         public void OnStartButton() => ShowWeapons();
         public void OnExitButton() => GameFlow.Quit();
+
+        /// <summary>11/19: 튜토리얼은 강제가 아니라 고를 수 있게 (바로 게임하는 사람도 있으니까). 지금 고른 무기로 연습</summary>
+        public void OnTutorialButton()
+        {
+            if (_loading) return;
+            _loading = true;
+            GameManager.Get().SetTutorialMode(true);
+            GameFlow.LoadPlay();
+        }
 
         // ---- 무기 선택창 ----
         public void OnStartFlySwatter() => StartWith(Weapon.FlySwatter);
@@ -53,6 +62,7 @@ namespace AeAeng
             if (_loading) return; // 두 번 눌러도 한 번만
             _loading = true;
             GameManager.Get().SetWeapon(w);
+            GameManager.Get().SetTutorialMode(false);
             GameFlow.LoadPlay();
         }
 

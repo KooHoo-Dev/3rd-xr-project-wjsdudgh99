@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 8280967626676186709}
   - component: {fileID: 5164255792954760719}
   - component: {fileID: 5013084928869941704}
+  - component: {fileID: 5888809935521389992}
   m_Layer: 0
   m_Name: FlySwatter
   m_TagString: Untagged
@@ -333,8 +334,29 @@ MonoBehaviour:
   swingSpeed: 3.5
   swingCooldown: 0.35
   swingStartTime: 0.24
+  rearmRatio: 0.5
   hitHapticAmplitude: 0.6
   hitHapticDuration: 0.08
+--- !u!114 &5888809935521389992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3257633204376864432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ece97f4b4ddfd8342b9fc02b210b75c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AeAeng.SwingTrail
+  trailMaterial: {fileID: 2100000, guid: 3e08e2b1451aefd46aa1888a4dd1064c, type: 2}
+  minSpeed: 0
+  trailSeconds: 0.12
+  width: 0.05
+  color: {r: 0.85, g: 0.92, b: 1, a: 0.35}
+  grabHaptic: 0.25
+  releaseHaptic: 0.12
+  hapticSeconds: 0.04
 --- !u!1 &6448233954502094672
 GameObject:
   m_ObjectHideFlags: 0

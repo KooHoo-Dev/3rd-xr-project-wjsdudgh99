@@ -34,6 +34,8 @@ namespace AeAeng
         public float fadeSeconds = 0.3f;
         [Tooltip("이 시간 안에 여러 마리가 도망가면 한 번에 묶어서 알림")]
         public float escapeMergeSeconds = 0.6f;
+        [Tooltip("큰 글 + 작은 글 글자 수가 이보다 많으면 작은 글을 아랫줄로 내림 (11/19 헤드셋: 튜토리얼 안내가 한 줄로 길어 화면 밖으로 잘림)")]
+        public int stackOverChars = 28;
 
         static readonly Color CatchRing = new Color32(0xEF, 0x9F, 0x27, 0xFF);
         static readonly Color CatchIcon = new Color32(0xFA, 0xC7, 0x75, 0xFF);
@@ -47,10 +49,17 @@ namespace AeAeng
         HeadLock _lock;
         Coroutine _show, _escapeWait;
         int _pendingEscapes;
+        TextAlignmentOptions _mainAlign;
+        float _subRatio = 0.63f;
 
         void Awake()
         {
             _lock = GetComponent<HeadLock>();
+            if (mainText != null)
+            {
+                _mainAlign = mainText.alignment;
+                if (subText != null && mainText.fontSize > 0f) _subRatio = subText.fontSize / mainText.fontSize;
+            }
             if (group != null) group.alpha = 0f;
         }
 
@@ -81,12 +90,37 @@ namespace AeAeng
             if (n > 0) Show($"모기 {n}마리가 사라졌다!", null, Style.Escape);
         }
 
-        public void Show(string main, string sub, Style style)
+        public void Show(string main, string sub, Style style) => Show(main, sub, style, holdSeconds);
+
+        /// <summary>hold = 머무는 시간. float.PositiveInfinity 면 Hide() 나 다음 알림까지 계속 보임 (튜토리얼 안내)</summary>
+        public void Show(string main, string sub, Style style, float hold)
         {
             if (mainText == null || string.IsNullOrEmpty(main)) return;
             Apply(main, sub, style);
             if (_show != null) StopCoroutine(_show);
-            _show = StartCoroutine(Run());
+            _show = StartCoroutine(Run(hold));
+        }
+
+        /// <summary>계속 보이는 안내 (튜토리얼 단계)</summary>
+        public void ShowSticky(string main, string sub = null) => Show(main, sub, Style.Info, float.PositiveInfinity);
+
+        /// <summary>지금 알림을 부드럽게 숨김</summary>
+        public void Hide()
+        {
+            if (_show != null) StopCoroutine(_show);
+            _show = StartCoroutine(FadeOut());
+        }
+
+        IEnumerator FadeOut()
+        {
+            float from = group != null ? group.alpha : 0f;
+            for (float t = from; t > 0f; t -= Time.unscaledDeltaTime / fadeSeconds)
+            {
+                if (group != null) group.alpha = t;
+                yield return null;
+            }
+            if (group != null) group.alpha = 0f;
+            _show = null;
         }
 
         void Apply(string main, string sub, Style style)
@@ -100,12 +134,26 @@ namespace AeAeng
                 default: ringC = InfoRing; textC = InfoText; iconC = Color.white; iconS = null; break;
             }
 
-            mainText.text = main;
+            bool hasSub = !string.IsNullOrEmpty(sub);
+            // 길면 두 줄: 큰 글 아래에 작은 글 (가운데 정렬). 짧으면 예전처럼 한 줄에 나란히
+            bool stacked = hasSub && main.Length + sub.Length > stackOverChars;
+            if (stacked)
+            {
+                string hex = ColorUtility.ToHtmlStringRGB(ringC);
+                int pct = Mathf.RoundToInt(_subRatio * 100f);
+                mainText.text = $"{main}\n<size={pct}%><color=#{hex}>{sub}</color></size>";
+                mainText.alignment = TextAlignmentOptions.Center;
+            }
+            else
+            {
+                mainText.text = main;
+                mainText.alignment = _mainAlign;
+            }
             mainText.color = textC;
             if (subText != null)
             {
-                subText.gameObject.SetActive(!string.IsNullOrEmpty(sub));
-                subText.text = sub ?? "";
+                subText.gameObject.SetActive(hasSub && !stacked);
+                subText.text = stacked ? "" : sub;
                 subText.color = ringC;
             }
             if (ring != null) ring.color = ringC;
@@ -118,7 +166,7 @@ namespace AeAeng
             if (pill != null) LayoutRebuilder.ForceRebuildLayoutImmediate(pill);
         }
 
-        IEnumerator Run()
+        IEnumerator Run(float hold)
         {
             _lock.SnapToFront();
 
@@ -130,7 +178,8 @@ namespace AeAeng
             }
             SetPop(1f);
 
-            yield return new WaitForSecondsRealtime(holdSeconds);
+            if (float.IsPositiveInfinity(hold)) { _show = null; yield break; } // 계속 보임
+            yield return new WaitForSecondsRealtime(hold);
 
             for (float t = 1f; t > 0f; t -= Time.unscaledDeltaTime / fadeSeconds)
             {

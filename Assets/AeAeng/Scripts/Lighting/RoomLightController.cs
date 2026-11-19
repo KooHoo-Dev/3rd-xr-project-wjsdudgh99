@@ -29,6 +29,8 @@ namespace AeAeng
         [Range(0f, 6f)] public float ceilingIntensity = 1f;
         public Color panelOnColor = new Color(0.95f, 0.97f, 1f);
         public Color panelOffColor = new Color(0.07f, 0.07f, 0.08f);
+        [Tooltip("해가 뜬 뒤 꺼진 형광등 색. 형광등은 빛을 안 받는 재질이라, 낮에 어두운 색이면 천장에 검은 구멍처럼 보임 (11/19 헤드셋)")]
+        public Color panelOffDayColor = new Color(0.62f, 0.62f, 0.64f);
 
         [Header("해 뜨기 (SetDawn 0 → 1)")]
         [Tooltip("새벽 빛 색 (왼쪽 = 해 뜨기 시작, 오른쪽 = 아침)")]
@@ -183,7 +185,8 @@ namespace AeAeng
             if (ceilingPanel != null)
             {
                 ceilingPanel.GetPropertyBlock(_mpb);
-                _mpb.SetColor(BaseColorId, on ? panelOnColor : panelOffColor);
+                Color offPanel = Color.Lerp(panelOffColor, panelOffDayColor, Mathf.SmoothStep(0f, 1f, Dawn));
+                _mpb.SetColor(BaseColorId, on ? panelOnColor : offPanel);
                 ceilingPanel.SetPropertyBlock(_mpb);
             }
         }
