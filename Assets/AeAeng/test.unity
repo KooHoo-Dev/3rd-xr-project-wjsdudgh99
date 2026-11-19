@@ -9313,6 +9313,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FloorLamp
       objectReference: {fileID: 0}
+    - target: {fileID: 6839609775155749727, guid: a22580d983b277c488a26fd4f07286b5, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 62f2b2a3cfe716746944870d1a10ad51, type: 2}
     - target: {fileID: 7728257283041497537, guid: a22580d983b277c488a26fd4f07286b5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1
