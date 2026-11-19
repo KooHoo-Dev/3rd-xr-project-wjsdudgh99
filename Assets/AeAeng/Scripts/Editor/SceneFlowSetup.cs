@@ -27,6 +27,9 @@ namespace AeAeng.EditorTools
         const string ResultPath = "Assets/AeAeng/Result.unity";
         const string FontPath = "Assets/99. External Assets/Font/Noto_Sans_KR/NotoSansKR-Regular SDF.asset";
 
+        // 11/19: 시연 영상 조건(시작 화면에 앱 이름 + 내 이름) 때문에 메인 화면에 다시 넣음
+        const string Author = "전영호";
+
         static readonly Color PanelColor = new Color(0.04f, 0.06f, 0.11f, 0.88f);
         static readonly Color TitleColor = new Color(1f, 0.93f, 0.75f);
         static readonly Color TextColor = new Color(0.92f, 0.94f, 1f);
@@ -161,10 +164,11 @@ namespace AeAeng.EditorTools
             var ctrl = go.AddComponent<MenuController>();
 
             // 정면 약 2m (침대 자리 기준 +Z), 앉은 눈높이보다 조금 위
-            // 11/18: 제작자 이름 뺌, 무기 버튼은 Start 뒤 무기 선택창으로 옮김
+            // 11/18: 제작자 이름 뺐다가 11/19에 제목 아래 작게 다시 넣음 (시연 영상 조건). 무기 버튼은 Start 뒤 무기 선택창으로 옮김
             var canvas = MakeCanvas("MenuPanel", null, cam, new Vector2(900, 520), 0.0013f);
             canvas.transform.SetPositionAndRotation(SeatFront(2.0f, 1.35f), SeatRotation());
-            Label(canvas.transform, "Title", "애~앵", 170, new Vector2(0, 90), new Vector2(860, 220), TitleColor, FontStyles.Bold);
+            Label(canvas.transform, "Title", "애~앵", 170, new Vector2(0, 115), new Vector2(860, 220), TitleColor, FontStyles.Bold);
+            Label(canvas.transform, "Author", Author, 46, new Vector2(0, -20), new Vector2(860, 60), TextColor, FontStyles.Normal);
             // 11/19: Tutorial / Start / Exit (튜토리얼은 강제가 아니라 고를 수 있게)
             var tutorial = MakeButton(canvas.transform, "Tutorial", "Tutorial", new Vector2(-300, -140), ButtonAltColor);
             var start = MakeButton(canvas.transform, "Start", "Start", new Vector2(0, -140), ButtonColor);
