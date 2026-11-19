@@ -10,7 +10,7 @@ namespace AeAeng.EditorTools
     /// <summary>
     /// 돌돌 만 신문지 (11/18 중간 피드백). AeAeng > Build Newspaper
     ///  1) 메쉬: 바깥 한 겹이 살짝 튀어나온 나선 단면의 원통 + 양 끝에 돌돌 말린 무늬. 신문 글씨/나선 텍스처는 코드로 그림
-    ///  2) 프리팹: 파리채와 같은 잡기(SwatterGrab) / 치기(SwatterHit). 판정은 좁고(지름 6cm × 길이 28cm), 더 빨리 휘둘러야(2.0m/s) 잡힘.
+    ///  2) 프리팹: 파리채와 같은 잡기(SwatterGrab) / 치기(SwatterHit). 판정은 좁고(지름 5cm × 끝쪽 16cm), 길이 35cm, 2.5m/s 이상으로 휘둘러야 잡힘 (값은 아래 상수).
     ///     대신 휘두르는 소리가 더 낮고 묵직하며, 잡을 때 진동이 더 셈.
     ///  3) 파리채 프리팹에도 휘두르는 소리 / 잡을 때 진동을 넣음
     ///  4) 씬: 파리채와 같은 자리에 신문지를 놓고, WeaponSelector 로 메인 화면에서 고른 것만 보이게
@@ -32,14 +32,15 @@ namespace AeAeng.EditorTools
 
         // ---- 치수 (m) ----
         // 11/18 헤드셋 테스트: 막 휘둘러도 잘 잡혀서 파리채보다 쉬움 → 42cm/지름 4.4cm 에서 32cm/지름 3.6cm 로 줄임
-        const float Length = 0.32f;
+        // 11/19: 32cm 는 짧아서 파리채보다 어려움 → 35cm (판정도 끝쪽으로 3cm)
+        const float Length = 0.35f;
         const float Radius = 0.018f;
         const float InnerRatio = 0.93f;   // 나선 단면: 한 바퀴 돌며 반지름이 이 비율 → 1.0 (바깥 한 겹의 끝이 살짝 튀어나옴)
         const int Segments = 18;
 
         // ---- 판정 / 손맛 ----
         static readonly Vector3 NewspaperHalfExtents = new Vector3(0.025f, 0.08f, 0.025f); // 지름 5cm × 길이 16cm (전: 6cm × 28cm)
-        const float NewspaperHeadY = 0.22f; // 판정 0.14~0.30m: 손잡이 쪽은 안 잡히고 끝쪽 절반만
+        const float NewspaperHeadY = 0.27f; // 판정 0.19~0.35m: 손잡이 쪽은 안 잡히고 끝쪽 16cm만 (11/19: 32cm일 때 0.22)
         const float NewspaperMinSpeed = 2.5f; // 11/18: 2.0 은 그냥 움직여도 넘어서 3.0 으로. 11/19: 짧아서 파리채보다 어려워 2.5 로 낮춤
         const float SwatterMinSpeed = 3.5f;   // 11/18: 1.5 → 2.5 → 3.5 (채 머리가 손에서 38cm 라 신문지(22cm)보다 같은 손목 움직임에 더 빠름)
         // 공중(날고 있는) 모기가 판정에 걸렸을 때 잡힐 확률. 앉은 모기는 항상 잡힘

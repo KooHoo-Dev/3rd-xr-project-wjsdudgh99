@@ -232,7 +232,7 @@ MonoBehaviour:
   pressDirection: {x: 0, y: 0, z: -1}
   led: {fileID: 7337207927615052196}
   ledOn: {r: 0.35, g: 1, b: 0.45, a: 1}
-  ledOff: {r: 0.04, g: 0.12, b: 0.05, a: 1}
+  ledOff: {r: 1, g: 0.15, b: 0.1, a: 1}
   room: {fileID: 0}
 --- !u!1 &7385656558821144242
 GameObject:

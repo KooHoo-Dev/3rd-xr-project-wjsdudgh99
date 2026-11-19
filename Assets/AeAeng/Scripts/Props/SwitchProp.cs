@@ -6,7 +6,7 @@ namespace AeAeng
     /// <summary>
     /// 왼손에 늘 쥐고 있는 무선 스위치 소품 (기획서 2.3 왼손 스위치).
     /// - 왼손 트리거를 당기는 만큼 버튼이 눌려 들어감
-    /// - 작은 LED: 방 불이 켜져 있으면 초록, 꺼져 있으면 아주 어두운 초록 (어두운 방에서 손 위치 단서)
+    /// - 작은 LED: 방 불이 켜져 있으면 초록, 꺼져 있으면 빨강 (11/19. 빛을 안 받는 재질이라 어두운 방에서도 빛남 → 손 위치 단서)
     /// </summary>
     public class SwitchProp : MonoBehaviour
     {
@@ -17,7 +17,7 @@ namespace AeAeng
         public Vector3 pressDirection = Vector3.back;
         public Renderer led;
         public Color ledOn = new Color(0.35f, 1f, 0.45f);
-        public Color ledOff = new Color(0.04f, 0.12f, 0.05f);
+        public Color ledOff = new Color(1f, 0.15f, 0.1f);
         public RoomLightController room;
 
         static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");

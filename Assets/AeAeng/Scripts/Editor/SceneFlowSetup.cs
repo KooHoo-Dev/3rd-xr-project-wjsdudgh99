@@ -215,10 +215,10 @@ namespace AeAeng.EditorTools
                 RenderWeaponIcon(NewspaperPrefabPath, "WeaponIcon_Newspaper"),
                 new[]
                 {
-                    ("길이", "32cm"),
+                    ("길이", "35cm"),
                     ("치는 면", "끝쪽 16cm"),
                     ("공중 저격 확률", Percent(paperHit, 0.35f)),
-                    ("스윙 속도", "빠르게"), // 2.5m/s (11/19), 머리 22cm → 손목 회전은 파리채(3.5m/s, 38cm)보다 여전히 빨라야 함
+                    ("스윙 속도", "보통"), // 11/19: 35cm, 2.5m/s, 판정 중심 27cm → 손목 회전이 파리채(3.5m/s, 38cm)와 거의 같음 (전: 32cm, 3.0m/s → "빠르게")
                 });
             UnityEventTools.AddPersistentListener(a.onClick, ctrl.OnStartFlySwatter);
             UnityEventTools.AddPersistentListener(b.onClick, ctrl.OnStartNewspaper);
@@ -301,7 +301,7 @@ namespace AeAeng.EditorTools
 
                 var cam = pru.camera;
                 cam.orthographic = true;
-                // 두 무기를 같은 배율로 찍어 크기 차이가 보이게 (파리채 45cm 가 꽉 차는 크기 기준 → 신문지 32cm 는 약 70%)
+                // 두 무기를 같은 배율로 찍어 크기 차이가 보이게 (파리채 45cm 가 꽉 차는 크기 기준 → 신문지 35cm 는 약 78%)
                 cam.orthographicSize = IconOrthoSize;
                 cam.nearClipPlane = 0.01f;
                 cam.farClipPlane = 10f;
