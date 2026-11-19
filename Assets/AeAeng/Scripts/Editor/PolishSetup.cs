@@ -57,6 +57,7 @@ namespace AeAeng.EditorTools
             if (fx == null) fx = Undo.AddComponent<CatchEffects>(new GameObject("CatchEffects").SetParentReturn(systems.transform));
             fx.font = font;
             fx.particleMaterial = ParticleMaterial();
+            if (fx.hitClip == null) fx.hitClip = AssetDatabase.LoadAssetAtPath<AudioClip>(HitClipPath); // 11/19 잡는 소리
             EditorUtility.SetDirty(fx);
 
             // 3) 무기 궤적 + 진동
@@ -108,6 +109,7 @@ namespace AeAeng.EditorTools
         }
 
         public const string DropClipPath = "Assets/AeAeng/Sound/Drop/drop_tak.wav";
+        public const string HitClipPath = "Assets/AeAeng/Sound/Hit/hit_pak.wav";
 
         // ------------------------------------------------------------------
         // 재질 (URP Particles/Unlit 반투명) — 씬/프리팹에서 참조해야 빌드에 셰이더가 들어감

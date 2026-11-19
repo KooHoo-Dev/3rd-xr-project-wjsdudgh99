@@ -218,7 +218,7 @@ namespace AeAeng.EditorTools
                     ("길이", "32cm"),
                     ("치는 면", "끝쪽 16cm"),
                     ("공중 저격 확률", Percent(paperHit, 0.35f)),
-                    ("스윙 속도", "빠르게"), // 3.0m/s, 머리 22cm
+                    ("스윙 속도", "빠르게"), // 2.5m/s (11/19), 머리 22cm → 손목 회전은 파리채(3.5m/s, 38cm)보다 여전히 빨라야 함
                 });
             UnityEventTools.AddPersistentListener(a.onClick, ctrl.OnStartFlySwatter);
             UnityEventTools.AddPersistentListener(b.onClick, ctrl.OnStartNewspaper);

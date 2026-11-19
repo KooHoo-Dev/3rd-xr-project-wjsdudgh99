@@ -29,9 +29,19 @@ namespace AeAeng
         public int burstCount = 14;
         public Color dustColor = new Color(0.85f, 0.85f, 0.8f, 0.9f);
 
+        [Header("소리 (11/19)")]
+        [Tooltip("잡은 자리에서 나는 3D 타격음 (원본 hit-soundvideo-game-type 에서 앞 무음 0.062초를 잘라 모노 -3dB 로 만든 파일)")]
+        public AudioClip hitClip;
+        [Range(0f, 1f)] public float hitVolume = 0.7f;
+        [Tooltip("파리채 음높이")]
+        public float swatterPitch = 1f;
+        [Tooltip("신문지 음높이: 낮춰서 더 둔탁한 \"퍽\"")]
+        public float newspaperPitch = 0.8f;
+
         const int PoolSize = 4;
         readonly List<TextMeshPro> _texts = new List<TextMeshPro>();
         readonly List<ParticleSystem> _bursts = new List<ParticleSystem>();
+        readonly List<AudioSource> _sounds = new List<AudioSource>();
         int _next;
         Transform _head;
 
@@ -44,7 +54,21 @@ namespace AeAeng
             {
                 _texts.Add(MakeText(i));
                 _bursts.Add(MakeBurst(i));
+                _sounds.Add(MakeSound(_bursts[i].gameObject));
             }
+        }
+
+        static AudioSource MakeSound(GameObject at)
+        {
+            var a = at.AddComponent<AudioSource>();
+            a.playOnAwake = false;
+            a.loop = false;
+            a.spatialBlend = 1f;
+            a.rolloffMode = AudioRolloffMode.Logarithmic;
+            a.minDistance = 0.6f;
+            a.maxDistance = 8f;
+            a.dopplerLevel = 0f;
+            return a;
         }
 
         void OnEnable()
@@ -68,6 +92,14 @@ namespace AeAeng
             var burst = _bursts[i];
             burst.transform.position = pos;
             burst.Play();
+            if (hitClip != null)
+            {
+                var s = _sounds[i]; // 파티클과 같은 오브젝트 → 잡은 자리에서 남
+                s.clip = hitClip;
+                s.volume = hitVolume;
+                s.pitch = paper ? newspaperPitch : swatterPitch;
+                s.Play();
+            }
             StartCoroutine(PopText(_texts[i], pos, paper ? "퍽!" : "챱!", paper ? newspaperColor : swatterColor));
         }
 

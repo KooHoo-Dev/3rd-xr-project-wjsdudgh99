@@ -34,8 +34,8 @@ namespace AeAeng
         public float swingSpeed = 2.0f;
         [Tooltip("휘두르는 소리 최소 간격 (초)")]
         public float swingCooldown = 0.35f;
-        [Tooltip("소리 파일 앞의 무음 건너뛰기 (whip-snap 은 앞 0.24초가 무음)")]
-        public float swingStartTime = 0.24f;
+        [Tooltip("소리 파일 앞의 무음 건너뛰기 (11/19 바람 소리 whoosh_hwik.wav 는 앞을 잘라 둬서 0. 예전 whip-snap 은 0.24)")]
+        public float swingStartTime = 0f;
         [Tooltip("속도가 swingSpeed 의 이 비율 아래로 떨어져야 다음 휘두르는 소리가 날 수 있음")]
         [Range(0.2f, 0.9f)] public float rearmRatio = 0.5f;
         [Tooltip("모기를 잡았을 때 오른손 진동 세기 (0~1)")]

@@ -26,7 +26,8 @@ namespace AeAeng.EditorTools
         const string PrefabDir = "Assets/AeAeng/Prefabs";
         const string PrefabPath = PrefabDir + "/Newspaper.prefab";
         const string SwatterPrefabPath = PrefabDir + "/FlySwatter.prefab";
-        const string WhipClipPath = "Assets/AeAeng/Sound/Whip/universfield-whip-snap-242215.mp3";
+        // 11/19: 채찍 "짝" → 바람 "휙" (잡는 타격음과 겹치지 않게). 원본 dragon-studio-simple-whoosh-382724 에서 0.05~0.45초만 잘라 모노 -3dB
+        const string WhipClipPath = "Assets/AeAeng/Sound/Whip/whoosh_hwik.wav";
         const string PreviewDir = "Temp/NewspaperPreview";
 
         // ---- 치수 (m) ----
@@ -39,7 +40,7 @@ namespace AeAeng.EditorTools
         // ---- 판정 / 손맛 ----
         static readonly Vector3 NewspaperHalfExtents = new Vector3(0.025f, 0.08f, 0.025f); // 지름 5cm × 길이 16cm (전: 6cm × 28cm)
         const float NewspaperHeadY = 0.22f; // 판정 0.14~0.30m: 손잡이 쪽은 안 잡히고 끝쪽 절반만
-        const float NewspaperMinSpeed = 3.0f; // 11/18: 2.0 은 그냥 움직여도 넘어서 올림
+        const float NewspaperMinSpeed = 2.5f; // 11/18: 2.0 은 그냥 움직여도 넘어서 3.0 으로. 11/19: 짧아서 파리채보다 어려워 2.5 로 낮춤
         const float SwatterMinSpeed = 3.5f;   // 11/18: 1.5 → 2.5 → 3.5 (채 머리가 손에서 38cm 라 신문지(22cm)보다 같은 손목 움직임에 더 빠름)
         // 공중(날고 있는) 모기가 판정에 걸렸을 때 잡힐 확률. 앉은 모기는 항상 잡힘
         const float SwatterAirChance = 0.2f;   // 11/18: 크고 넓은 파리채가 공중은 더 어렵게 (신문지와 바꿈)
@@ -341,7 +342,7 @@ namespace AeAeng.EditorTools
             a.loop = false;
             a.spatialBlend = 1f;
             a.rolloffMode = AudioRolloffMode.Logarithmic;
-            a.minDistance = 0.3f;
+            a.minDistance = 1.0f; // 11/19: 0.3 → 1.0. 팔 거리(약 0.7~0.9m) 안에서는 작아지지 않게 (0.3이면 약 -8dB)
             a.maxDistance = 5f;
             a.pitch = pitch;
             a.volume = volume;
@@ -401,6 +402,7 @@ namespace AeAeng.EditorTools
             hit.hitHapticAmplitude = 1.0f;   // "세게": 파리채(0.6)보다 강하고 길게
             hit.hitHapticDuration = 0.14f;
             if (whip != null) hit.swingAudio = EnsureSwingAudio(head, whip, pitch: 0.75f, volume: 1.0f); // 낮고 묵직한 "휙"
+            hit.swingStartTime = 0f; // 파일 앞 무음을 잘라 둠
             PolishSetup.EnsureSwingTrail(go); // 11/19: 휘두를 때 궤적 + 잡기/놓기 진동
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(go, PrefabPath);
@@ -425,7 +427,8 @@ namespace AeAeng.EditorTools
                 hit.airCatchChance = SwatterAirChance;
                 hit.hitHapticAmplitude = 0.6f;
                 hit.hitHapticDuration = 0.08f;
-                if (whip != null) hit.swingAudio = EnsureSwingAudio(head, whip, pitch: 1.15f, volume: 0.75f);
+                if (whip != null) hit.swingAudio = EnsureSwingAudio(head, whip, pitch: 1.15f, volume: 1.0f); // 11/19: 바람 소리는 부드러워서 0.75 → 1.0
+                hit.swingStartTime = 0f;
                 PrefabUtility.SaveAsPrefabAsset(root, SwatterPrefabPath);
                 return "휘두르는 소리 + 진동 설정";
             }

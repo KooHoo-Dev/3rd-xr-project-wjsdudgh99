@@ -340,14 +340,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AeAeng.SwatterHit
   head: {fileID: 7697014266849306722}
   halfExtents: {x: 0.025, y: 0.08, z: 0.025}
-  minSpeed: 3
+  minSpeed: 2.5
   grab: {fileID: 312187489946512575}
   airCatchChance: 0.35
   airRetryDelay: 0.5
   swingAudio: {fileID: 7525478047830473682}
-  swingSpeed: 3
+  swingSpeed: 2.5
   swingCooldown: 0.4
-  swingStartTime: 0.24
+  swingStartTime: 0
   rearmRatio: 0.5
   hitHapticAmplitude: 1
   hitHapticDuration: 0.14
@@ -429,7 +429,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: b6cc339564ef32141a6c054c97bc8703, type: 3}
+  m_Resource: {fileID: 8300000, guid: 131b1259b7654efe8f4eebb6f4f93e92, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 0.75
@@ -439,7 +439,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 0.3
+  MinDistance: 1
   MaxDistance: 5
   Pan2D: 0
   rolloffMode: 0
