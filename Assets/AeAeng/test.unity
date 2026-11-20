@@ -6523,8 +6523,8 @@ MonoBehaviour:
   onEscaped:
     m_PersistentCalls:
       m_Calls: []
-  nearHapticDistance: 0.22
-  nearHapticAmplitude: 0.07
+  nearHapticDistance: 0.35
+  nearHapticAmplitude: 0.18
   nearHapticInterval: 0.25
 --- !u!4 &1456246085
 Transform:

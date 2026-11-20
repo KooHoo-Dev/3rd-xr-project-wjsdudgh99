@@ -132,8 +132,10 @@ namespace AeAeng
         }
 
         [Header("귓가 진동 (기획서 5.3: 모기가 아주 가까이 오면 아주 약하게 떨림)")]
-        public float nearHapticDistance = 0.22f;
-        [Range(0f, 1f)] public float nearHapticAmplitude = 0.07f;
+        [Tooltip("머리에서 이 거리 안에 날던 모기가 들어오면 진동. 11/20: 0.22 → 0.35 (귓가를 맴도는 반지름이 0.23~0.33m 라 0.22 로는 한 번도 안 울렸음)")]
+        public float nearHapticDistance = 0.35f;
+        [Tooltip("11/20: 0.07 → 0.18 (0.07 은 거의 안 느껴짐. 무기 잡기 진동이 0.25)")]
+        [Range(0f, 1f)] public float nearHapticAmplitude = 0.18f;
         public float nearHapticInterval = 0.25f;
         float _nextNearHaptic;
 
