@@ -8,7 +8,7 @@ namespace AeAeng
     /// <summary>
     /// 시선 아래쪽에 톡 튀어나오는 알림 (토스트). 11/18: 예전 녹색 "LIGHT OFF" 자리.
     ///  - 잡았을 때: 노란 테두리 + 체크, "2마리 잡았다!" + 작게 "남은 모기 1"
-    ///  - 도망갔을 때: 파란 테두리 + 바람, "모기 1마리가 사라졌다!" (0.6초 안에 여러 마리면 묶어서 한 번)
+    ///  - 도망갔을 때: 파란 테두리 + 바람, "모기 1마리가 도망갔다!" (0.6초 안에 여러 마리면 묶어서 한 번)
     ///  - 그 밖(튜토리얼 등): 회색 테두리, 글자만
     /// 반투명 어두운 알약 바탕이라 밝은 방 / 어두운 방 모두에서 읽힘. HeadLock 으로 부드럽게 따라옴.
     /// 등장 0.15초(살짝 커졌다 제자리) → 유지 → 0.3초 사라짐. 새 알림은 이전 것을 바로 바꿈.
@@ -74,7 +74,7 @@ namespace AeAeng
         public void ShowCatch(int caught, int remaining) =>
             Show($"{caught}마리 잡았다!", remaining > 0 ? $"남은 모기 {remaining}" : null, Style.Catch);
 
-        /// <summary>모기가 도망감. 짧은 시간에 여러 번 오면 모아서 "모기 N마리가 사라졌다!" 한 번</summary>
+        /// <summary>모기가 도망감. 짧은 시간에 여러 번 오면 모아서 "모기 N마리가 도망갔다!" 한 번</summary>
         public void ReportEscape()
         {
             _pendingEscapes++;
@@ -87,7 +87,7 @@ namespace AeAeng
             int n = _pendingEscapes;
             _pendingEscapes = 0;
             _escapeWait = null;
-            if (n > 0) Show($"모기 {n}마리가 사라졌다!", null, Style.Escape);
+            if (n > 0) Show($"모기 {n}마리가 도망갔다!", null, Style.Escape);
         }
 
         public void Show(string main, string sub, Style style) => Show(main, sub, style, holdSeconds);

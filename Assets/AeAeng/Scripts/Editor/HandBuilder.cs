@@ -25,7 +25,7 @@ namespace AeAeng.EditorTools
         // 컨트롤러(조준 자세) 기준 손목 위치/각도. 헤드셋에서 보고 씬의 LeftHand/RightHand Transform을 직접 조정해도 됨.
         // 다시 실행해도 이미 붙어 있는 손의 위치는 바꾸지 않는다.
         static readonly Vector3 WristOffset = new Vector3(0f, -0.035f, -0.11f);
-        // 11/17 헤드셋 확인: 20°는 손가락이 위를 향함 → 45°로. 정확한 값은 HandOffsetTuner로 맞춘 뒤 반영
+        // 11/17 헤드셋 확인: 20°는 손가락이 위를 향함 → 45°로. 정확한 값은 HandOffsetTuner(11/20 삭제)로 맞춘 뒤 반영
         const float WristPitch = 45f;
 
         static readonly Color RimColor = new Color(0.25f, 0.69f, 0.80f);
@@ -196,18 +196,10 @@ namespace AeAeng.EditorTools
                 rays = true;
             }
 
-            // 헤드셋 안 손 위치 튜너 (테스트용)
-            bool tuner = false;
-            if (Object.FindFirstObjectByType<HandOffsetTuner>(FindObjectsInactive.Include) == null)
-            {
-                var go = new GameObject("HandOffsetTuner (TEST)");
-                go.AddComponent<HandOffsetTuner>();
-                Undo.RegisterCreatedObjectUndo(go, "Add Hand Tuner");
-                tuner = true;
-            }
+            // 11/20: 헤드셋 안 손 위치 튜너(HandOffsetTuner, 테스트용)는 값을 다 맞춰서 스크립트째 삭제함
 
             EditorSceneManager.MarkSceneDirty(leftCtrl.gameObject.scene);
-            return $"attached {placed}, controller models hidden {hidden}, rayVisibility added {rays}, tuner added {tuner}";
+            return $"attached {placed}, controller models hidden {hidden}, rayVisibility added {rays}";
         }
 
         /// <summary>씬에 붙은 손의 위치/각도를 HandBuilder 기본값으로 되돌린다.</summary>

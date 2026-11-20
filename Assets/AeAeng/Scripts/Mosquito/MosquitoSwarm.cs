@@ -87,7 +87,7 @@ namespace AeAeng
         public UnityEvent<string> onMessage;
         public UnityEvent<Mosquito> onCaught;
         public UnityEvent onAllCaught;
-        [Tooltip("모기 한 마리가 눈치채고 도망감 (알림: 모기 N마리가 사라졌다!)")]
+        [Tooltip("모기 한 마리가 눈치채고 도망감 (알림: 모기 N마리가 도망갔다!)")]
         public UnityEvent onEscaped;
 
         public int Total { get; private set; }
@@ -134,8 +134,8 @@ namespace AeAeng
         [Header("귓가 진동 (기획서 5.3: 모기가 아주 가까이 오면 아주 약하게 떨림)")]
         [Tooltip("머리에서 이 거리 안에 날던 모기가 들어오면 진동. 11/20: 0.22 → 0.35 (귓가를 맴도는 반지름이 0.23~0.33m 라 0.22 로는 한 번도 안 울렸음)")]
         public float nearHapticDistance = 0.35f;
-        [Tooltip("11/20: 0.07 → 0.18 (0.07 은 거의 안 느껴짐. 무기 잡기 진동이 0.25)")]
-        [Range(0f, 1f)] public float nearHapticAmplitude = 0.18f;
+        [Tooltip("0 이면 끔. 11/20: 0.07 → 0.18 로 고쳐서 느껴지게 했다가, 같은 날 뺌 (소리로 이미 알 수 있고, 귀가 아니라 양손이 떨려 방향도 못 알려 주며, 진동은 내 행동의 결과에만 쓰기로)")]
+        [Range(0f, 1f)] public float nearHapticAmplitude = 0f;
         public float nearHapticInterval = 0.25f;
         float _nextNearHaptic;
 
@@ -224,7 +224,7 @@ namespace AeAeng
         {
             if (msg == Msg.Escaped)
             {
-                // 11/18: 문구 대신 이벤트 → 알림(토스트)이 0.6초 안의 도망을 묶어 "모기 N마리가 사라졌다!"
+                // 11/18: 문구 대신 이벤트 → 알림(토스트)이 0.6초 안의 도망을 묶어 "모기 N마리가 도망갔다!"
                 Debug.Log("[MosquitoSwarm] 모기가 도망감");
                 onEscaped?.Invoke();
                 return;
